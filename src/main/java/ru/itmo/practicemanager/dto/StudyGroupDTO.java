@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class StudyGroupDTO {
-    Long number;
+    String number;
     Long directionId;
 }

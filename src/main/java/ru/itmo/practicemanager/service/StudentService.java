@@ -1,93 +1,294 @@
 package ru.itmo.practicemanager.service;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
-import ru.itmo.practicemanager.dto.StudentDTO;
-import ru.itmo.practicemanager.entity.ApprovalStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import ru.itmo.practicemanager.dto.GroupedApprovalsDto;
+import ru.itmo.practicemanager.dto.StudentApprovalDto;
+import ru.itmo.practicemanager.dto.UserDto;
+import ru.itmo.practicemanager.entity.Role;
 import ru.itmo.practicemanager.entity.Student;
 import ru.itmo.practicemanager.entity.StudyGroup;
-import ru.itmo.practicemanager.entity.Supervisor;
-import ru.itmo.practicemanager.repository.ApprovalStatusRepository;
+import ru.itmo.practicemanager.entity.User;
+import ru.itmo.practicemanager.exception.RegistrationException;
 import ru.itmo.practicemanager.repository.StudentRepository;
 import ru.itmo.practicemanager.repository.StudyGroupRepository;
-import ru.itmo.practicemanager.repository.SupervisorRepository;
+import ru.itmo.practicemanager.repository.UserRepository;
+import ru.itmo.practicemanager.service.excel.ParserService;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StudentService {
+    private final ParserService parserService;
 
     private final StudentRepository studentRepository;
     private final StudyGroupRepository studyGroupRepository;
-    private final SupervisorRepository supervisorRepository;
-    private final ApprovalStatusRepository approvalStatusRepository;
+    private final UserRepository userRepository;
 
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    @Transactional
+    public void processStudentExcel(MultipartFile file) {
+        List<Student> students = parserService.parseStudentsFromExcel(file);
+        saveStudentsWithGroups(students);
     }
 
-    public Optional<Student> getStudentById(Long id) {
-        return studentRepository.findById(id);
+    private void saveStudentsWithGroups(List<Student> students) {
+        students.forEach(student -> {
+            StudyGroup group = studyGroupRepository.findByNumber(student.getStudyGroup().getNumber())
+                    .orElseGet(() -> studyGroupRepository.save(student.getStudyGroup()));
+            student.setStudyGroup(group);
+        });
+        studentRepository.saveAll(students);
     }
 
-    public Student createStudent(StudentDTO studentDTO) {
-        StudyGroup group = studyGroupRepository.findById(studentDTO.getGroupId())
-                .orElseThrow(() -> new RuntimeException("Группа с id " + studentDTO.getGroupId() + " не найдена"));
+    @Transactional
+    public void registerStudent(UserDto request) {
+        Student student = studentRepository.findByFullNameAndIsuNumber(
+                request.getFullName(),
+                request.getIsuNumber()
+        ).orElseThrow(() -> new RegistrationException(
+                "Студент не найден. Проверьте ФИО, номер ИСУ и группу"));
 
-        Supervisor supervisor = supervisorRepository.findById(studentDTO.getSupervisorId())
-                .orElseThrow(() -> new RuntimeException("Руководитель с id " + studentDTO.getSupervisorId() + " не найден"));
+        if (student.getUser() != null) {
+            throw new RegistrationException("Этот студент уже зарегистрирован");
+        }
 
-        ApprovalStatus approvalStatus = approvalStatusRepository.findById(studentDTO.getApprovalStatusId())
-                .orElseThrow(() -> new RuntimeException("Статус утверждения с id " + studentDTO.getApprovalStatusId() + " не найден"));
-
-        Student student = Student.builder()
-                .surname(studentDTO.getSurname())
-                .name(studentDTO.getName())
-                .patronymic(studentDTO.getPatronymic())
-                .telegrammName(studentDTO.getTelegrammName())
-                .studyGroup(group)
-                .supervisor(supervisor)
-                .approvalStatus(approvalStatus)
-                .isCompanyApproved(studentDTO.getIsCompanyApproved())
-                .isStatementDelivered(studentDTO.getIsStatementDelivered())
-                .isStatementSigned(studentDTO.getIsStatementSigned())
-                .isStatementScanned(studentDTO.getIsStatementScanned())
+        User user = User.builder()
+                .telegramId(request.getTelegramId())
+                .telegramUsername(request.getTelegramUsername())
+                .role(Role.STUDENT)
+                .approved(false)
                 .build();
 
-        return studentRepository.save(student);
+        userRepository.save(user);
+        student.setUser(user);
+        studentRepository.save(student);
     }
 
-    public Student updateStudent(Long id, StudentDTO updatedStudentDTO) {
-        Student existingStudent = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Студент с id " + id + " не найден"));
+    public List<GroupedApprovalsDto> getPendingApprovalsGrouped() {
+        return studentRepository.findByUserApprovedFalseWithUser().stream()
+                .collect(Collectors.groupingBy(
+                        student -> student.getStudyGroup().getNumber(),
+                        TreeMap::new,
+                        Collectors.toList()
+                ))
+                .entrySet().stream()
+                .map(entry -> {
+                    GroupedApprovalsDto groupDto = new GroupedApprovalsDto();
+                    groupDto.setGroupNumber(entry.getKey());
 
-        StudyGroup group = studyGroupRepository.findById(updatedStudentDTO.getGroupId())
-                .orElseThrow(() -> new RuntimeException("Группа с id " + updatedStudentDTO.getGroupId() + " не найдена"));
+                    groupDto.setStudents(entry.getValue().stream()
+                            .map(student -> {
+                                StudentApprovalDto studentDto = new StudentApprovalDto();
+                                studentDto.setId(student.getId());
+                                studentDto.setIsuNumber(student.getIsuNumber());
+                                studentDto.setFullName(student.getFullName());
 
-        Supervisor supervisor = supervisorRepository.findById(updatedStudentDTO.getSupervisorId())
-                .orElseThrow(() -> new RuntimeException("Руководитель с id " + updatedStudentDTO.getSupervisorId() + " не найден"));
+                                if (student.getUser() != null) {
+                                    studentDto.setTelegramUsername(student.getUser().getTelegramUsername());
+                                }
 
-        ApprovalStatus approvalStatus = approvalStatusRepository.findById(updatedStudentDTO.getApprovalStatusId())
-                .orElseThrow(() -> new RuntimeException("Статус утверждения с id " + updatedStudentDTO.getApprovalStatusId() + " не найден"));
+                                return studentDto;
+                            })
+                            .collect(Collectors.toList()));
 
-        existingStudent.setSurname(updatedStudentDTO.getSurname());
-        existingStudent.setName(updatedStudentDTO.getName());
-        existingStudent.setPatronymic(updatedStudentDTO.getPatronymic());
-        existingStudent.setTelegrammName(updatedStudentDTO.getTelegrammName());
-        existingStudent.setStudyGroup(group);
-        existingStudent.setSupervisor(supervisor);
-        existingStudent.setApprovalStatus(approvalStatus);
-        existingStudent.setIsCompanyApproved(updatedStudentDTO.getIsCompanyApproved());
-        existingStudent.setIsStatementDelivered(updatedStudentDTO.getIsStatementDelivered());
-        existingStudent.setIsStatementSigned(updatedStudentDTO.getIsStatementSigned());
-        existingStudent.setIsStatementScanned(updatedStudentDTO.getIsStatementScanned());
-
-        return studentRepository.save(existingStudent);
+                    return groupDto;
+                })
+                .collect(Collectors.toList());
     }
 
-    public void deleteStudent(Long id) {
-        studentRepository.deleteById(id);
+    @Transactional
+    public void approveByIsuNumber(String isuNumber, Long adminId) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new EntityNotFoundException("Администратор не найден"));
+
+        if (admin.getRole() != Role.ADMIN) {
+            throw new RuntimeException("Только администратор может подтверждать регистрации");
+        }
+
+        Student student = studentRepository.findByIsuNumber(isuNumber)
+                .orElseThrow(() -> new EntityNotFoundException("Студент не найден"));
+
+        if (student.getUser() == null) {
+            throw new RuntimeException("Студент не начал процесс регистрации");
+        }
+
+        if (student.getUser().isApproved()) {
+            throw new RuntimeException("Студент уже подтвержден");
+        }
+
+        student.getUser().setApproved(true);
+        userRepository.save(student.getUser());
+    }
+
+    public byte[] generateApprovalExcel() throws IOException {
+        List<Student> unapprovedStudents = studentRepository.findByUserApprovedFalseWithUser();
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Pending Approvals");
+
+            CellStyle groupHeaderStyle = createGroupHeaderStyle(workbook);
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle checkboxStyle = createCheckboxStyle(workbook);
+
+            Map<StudyGroup, List<Student>> grouped = unapprovedStudents.stream()
+                    .collect(Collectors.groupingBy(Student::getStudyGroup, TreeMap::new, Collectors.toList()));
+
+            int rowNum = 0;
+            for (Map.Entry<StudyGroup, List<Student>> entry : grouped.entrySet()) {
+                rowNum = addGroupHeader(sheet, rowNum, entry.getKey(), groupHeaderStyle);
+
+                rowNum = addColumnHeaders(sheet, rowNum, headerStyle);
+
+                rowNum = addStudentRowsWithCheckboxes(workbook, sheet, rowNum, entry.getValue(), checkboxStyle);
+
+                rowNum++;
+            }
+
+            for (int i = 0; i < 4; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            return convertWorkbookToBytes(workbook);
+        }
+    }
+
+    private int addStudentRowsWithCheckboxes(XSSFWorkbook workbook, XSSFSheet sheet,
+                                             int rowNum, List<Student> students, CellStyle checkboxStyle) {
+        XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
+        XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint)
+                dvHelper.createExplicitListConstraint(new String[]{"ДА", "НЕТ"});
+
+        for (Student student : students) {
+            XSSFRow row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(student.getIsuNumber());
+            row.createCell(1).setCellValue(student.getFullName());
+            row.createCell(2).setCellValue(
+                    student.getUser() != null ? student.getUser().getTelegramUsername() : "N/A"
+            );
+
+            XSSFCell checkboxCell = row.createCell(3);
+            checkboxCell.setCellValue("НЕТ");
+            checkboxCell.setCellStyle(checkboxStyle);
+
+            CellRangeAddressList addressList = new CellRangeAddressList(
+                    rowNum - 1, rowNum - 1, 3, 3);
+            XSSFDataValidation validation = (XSSFDataValidation) dvHelper.createValidation(
+                    dvConstraint, addressList);
+            validation.setSuppressDropDownArrow(true);
+            validation.setShowErrorBox(true);
+            sheet.addValidationData(validation);
+        }
+        return rowNum;
+    }
+
+    @Transactional
+    public void processApprovalExcel(MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream();
+             Workbook workbook = WorkbookFactory.create(inputStream)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
+            for (Row row : sheet) {
+                if (shouldProcessRow(row)) {
+                    processApprovalRow(row);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean shouldProcessRow(Row row) {
+        return row.getRowNum() > 0 &&
+                row.getCell(0) != null &&
+                row.getCell(3) != null;
+    }
+
+    private void processApprovalRow(Row row) {
+        Cell checkboxCell = row.getCell(3);
+        boolean isApproved = false;
+
+        if (checkboxCell.getCellType() == CellType.STRING) {
+            isApproved = checkboxCell.getStringCellValue().equalsIgnoreCase("ДА");
+        } else if (checkboxCell.getCellType() == CellType.BOOLEAN) {
+            isApproved = checkboxCell.getBooleanCellValue();
+        }
+
+        if (isApproved) {
+            String isuNumber = row.getCell(0).getStringCellValue();
+            studentRepository.findByIsuNumber(isuNumber).ifPresent(student -> {
+                if (student.getUser() != null && !student.getUser().isApproved()) {
+                    student.getUser().setApproved(true);
+                    userRepository.save(student.getUser());
+                    log.info("Approved student: ISU {}", isuNumber);
+                }
+            });
+        }
+    }
+
+    private CellStyle createGroupHeaderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 12);
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        return style;
+    }
+
+    private CellStyle createHeaderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        style.setBorderBottom(BorderStyle.THIN);
+        return style;
+    }
+
+    private CellStyle createCheckboxStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setAlignment(HorizontalAlignment.CENTER);
+        return style;
+    }
+
+    private int addGroupHeader(Sheet sheet, int rowNum, StudyGroup group, CellStyle style) {
+        Row row = sheet.createRow(rowNum++);
+        Cell cell = row.createCell(0);
+        cell.setCellValue("Группа: " + group.getNumber());
+        cell.setCellStyle(style);
+        return rowNum;
+    }
+
+    private int addColumnHeaders(Sheet sheet, int rowNum, CellStyle style) {
+        Row row = sheet.createRow(rowNum++);
+        String[] headers = {"ISU Номер", "ФИО", "Telegram", "Подтвердить (ДА/НЕТ)"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = row.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(style);
+        }
+        return rowNum;
+    }
+
+    private byte[] convertWorkbookToBytes(Workbook workbook) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        return outputStream.toByteArray();
     }
 }

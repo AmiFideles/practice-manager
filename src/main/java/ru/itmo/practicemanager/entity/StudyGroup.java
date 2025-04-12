@@ -11,12 +11,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudyGroup {
+public class StudyGroup implements Comparable<StudyGroup> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
-    Long number;
+    String number;
     @ManyToOne
     @JoinColumn(name = "direction_id")
     Direction direction;
+
+    @Override
+    public int compareTo(StudyGroup other) {
+        return this.number.compareTo(other.number);
+    }
 }
