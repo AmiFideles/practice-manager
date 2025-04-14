@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.itmo.practicemanager.entity.Student;
+import ru.itmo.practicemanager.entity.StudyGroup;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,4 +17,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     @Query("SELECT s FROM Student s JOIN FETCH s.user u WHERE u.approved = false")
     List<Student> findByUserApprovedFalseWithUser();
+
+    List<Student> findStudentByIsCompanyDetailsFilled(Boolean isCompanyDetailsFilled);
+
+    List<Student> findStudentByStudyGroup(StudyGroup studyGroup);
 }

@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     private String surname;
@@ -37,6 +37,7 @@ public class Student {
     private Boolean isStatementSigned;
     private Boolean isStatementScanned;
     private Boolean isNotificationSent;
+    private Boolean isCompanyDetailsFilled;
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;

@@ -13,11 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.itmo.practicemanager.dto.GroupedApprovalsDto;
 import ru.itmo.practicemanager.dto.StudentApprovalDto;
 import ru.itmo.practicemanager.dto.UserDto;
-import ru.itmo.practicemanager.entity.Role;
-import ru.itmo.practicemanager.entity.Student;
-import ru.itmo.practicemanager.entity.StudyGroup;
-import ru.itmo.practicemanager.entity.User;
+import ru.itmo.practicemanager.entity.*;
 import ru.itmo.practicemanager.exception.RegistrationException;
+import ru.itmo.practicemanager.repository.ApprovalStatusRepository;
 import ru.itmo.practicemanager.repository.StudentRepository;
 import ru.itmo.practicemanager.repository.StudyGroupRepository;
 import ru.itmo.practicemanager.repository.UserRepository;
@@ -40,12 +38,65 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final StudyGroupRepository studyGroupRepository;
     private final UserRepository userRepository;
+    private final ApprovalStatusRepository approvalStatusRepository;
 
     @Transactional
     public void processStudentExcel(MultipartFile file) {
         List<Student> students = parserService.parseStudentsFromExcel(file);
         saveStudentsWithGroups(students);
     }
+
+    public Student getByIsuNumber(String isuNumber){
+        return studentRepository.findByIsuNumber(isuNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Студент с isu " + isuNumber + " не найден"));
+    }
+
+    public List<Student> getByGroupNumber(Long id){
+        StudyGroup group = studyGroupRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Группа с id " + id + " не найдена"));
+        return studentRepository.findStudentByStudyGroup(group);
+    }
+
+    public List<Student> getAllByIsCompanyDetailsFilled(){
+        return studentRepository.findStudentByIsCompanyDetailsFilled(true);
+    }
+
+    public void setStatuses(
+            String studentIsuNumber,
+            Long approvalStatusId,
+            Boolean isCompanyApproved,
+            Boolean isStatementDelivered,
+            Boolean isStatementSigned,
+            Boolean isStatementScanned
+    ) {
+        Student student = studentRepository.findByIsuNumber(studentIsuNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Студент с isu " + studentIsuNumber + " не найден"));
+
+        if (approvalStatusId != null) {
+            ApprovalStatus status = approvalStatusRepository.findById(approvalStatusId)
+                .orElseThrow(() -> new IllegalArgumentException("Статус с id " + approvalStatusId + " не найден"));
+            student.setApprovalStatus(status);
+        }
+
+        if (isCompanyApproved != null) {
+            student.setIsCompanyApproved(isCompanyApproved);
+        }
+
+        if (isStatementDelivered != null) {
+            student.setIsStatementDelivered(isStatementDelivered);
+        }
+
+        if (isStatementSigned != null) {
+            student.setIsStatementSigned(isStatementSigned);
+        }
+
+        if (isStatementScanned != null) {
+            student.setIsStatementScanned(isStatementScanned);
+        }
+
+        studentRepository.save(student);
+    }
+
 
     private void saveStudentsWithGroups(List<Student> students) {
         students.forEach(student -> {
