@@ -31,9 +31,7 @@ public class SupervisorService {
                 .orElseThrow(() -> new RuntimeException("Организация с id " + supervisorDTO.getOrganizationId() + " не найдена"));
 
         Supervisor supervisor = new Supervisor();
-        supervisor.setSurname(supervisorDTO.getSurname());
         supervisor.setName(supervisorDTO.getName());
-        supervisor.setPatronymic(supervisorDTO.getPatronymic());
         supervisor.setMail(supervisorDTO.getMail());
         supervisor.setPhone(supervisorDTO.getPhone());
         supervisor.setOrganization(organization);
@@ -48,9 +46,7 @@ public class SupervisorService {
         Organization organization = organizationRepository.findById(updatedSupervisorDTO.getOrganizationId())
                 .orElseThrow(() -> new RuntimeException("Организация с id " + updatedSupervisorDTO.getOrganizationId() + " не найдена"));
 
-        existingSupervisor.setSurname(updatedSupervisorDTO.getSurname());
         existingSupervisor.setName(updatedSupervisorDTO.getName());
-        existingSupervisor.setPatronymic(updatedSupervisorDTO.getPatronymic());
         existingSupervisor.setMail(updatedSupervisorDTO.getMail());
         existingSupervisor.setPhone(updatedSupervisorDTO.getPhone());
         existingSupervisor.setOrganization(organization);

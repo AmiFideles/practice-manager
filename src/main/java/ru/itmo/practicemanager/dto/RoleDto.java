@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ApprovalStatusDTO {
-    String status;
+public class RoleDto {
+    String role;
 }

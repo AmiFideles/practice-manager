@@ -1,6 +1,9 @@
 package ru.itmo.practicemanager.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +19,6 @@ public class Direction {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
     String transcript;
-    @ManyToOne
-    @JoinColumn(name = "faculty_id")
-    Faculty faculty;
+    String number;
+    String facultyName;
 }

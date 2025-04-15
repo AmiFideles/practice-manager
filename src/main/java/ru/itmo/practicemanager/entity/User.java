@@ -1,5 +1,6 @@
 package ru.itmo.practicemanager.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,8 +23,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private boolean approved;
 
     @OneToOne(mappedBy = "user")
+    @JsonIgnore
     private Student student;
 }

@@ -51,34 +51,40 @@ public class StudentController {
                 .body(report);
     }
 
-    @GetMapping("/company-filled")
-    public ResponseEntity<List<Student>> getStudentsByCompanyDetailsFilledStatus() {
-        List<Student> students = studentService.getAllByIsCompanyDetailsFilled();
-        return ResponseEntity.ok(students);
-    }
-
     @GetMapping("/{isuNumber}")
     public ResponseEntity<Student> getStudentByIsuNumber(@PathVariable String isuNumber) {
         Student student = studentService.getByIsuNumber(isuNumber);
         return ResponseEntity.ok(student);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<Student>> getStudentsByGroupNumber(@RequestParam Long groupId) {
-        List<Student> students = studentService.getByGroupNumber(groupId);
+    @GetMapping("")
+    public ResponseEntity<List<Student>> getStudentsByFilters(
+            @RequestParam(required = false) String groupNumber,
+            @RequestParam(required = false) Boolean isStatementDelivered,
+            @RequestParam(required = false) Boolean isStatementSigned,
+            @RequestParam(required = false) Boolean isStatementScanned,
+            @RequestParam(required = false) Boolean isNotificationSent) {
+
+        List<Student> students = studentService.getStudentsByFilters(
+                groupNumber,
+                isStatementDelivered,
+                isStatementSigned,
+                isStatementScanned,
+                isNotificationSent
+        );
+
         return ResponseEntity.ok(students);
     }
 
     @PutMapping("/{isuNumber}/status")
     public ResponseEntity<?> updateStudentStatuses(
             @PathVariable String isuNumber,
-            @RequestParam Long approvalStatusId,
-            @RequestParam Boolean isCompanyApproved,
-            @RequestParam Boolean isStatementDelivered,
-            @RequestParam Boolean isStatementSigned,
-            @RequestParam Boolean isStatementScanned
+            @RequestParam(required = false) Boolean isStatementDelivered,
+            @RequestParam(required = false) Boolean isStatementSigned,
+            @RequestParam(required = false) Boolean isStatementScanned,
+            @RequestParam(required = false) Boolean isNotificationSent
     ) {
-        studentService.setStatuses(isuNumber, approvalStatusId, isCompanyApproved, isStatementDelivered, isStatementSigned, isStatementScanned);
+        studentService.setStatuses(isuNumber, isStatementDelivered, isStatementSigned, isStatementScanned, isNotificationSent);
         return ResponseEntity.ok().build();
     }
 }

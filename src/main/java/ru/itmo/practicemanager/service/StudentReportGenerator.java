@@ -80,24 +80,24 @@ public class StudentReportGenerator {
     }
 
     private String determineRowStyle(Student student) {
-        if (student.getSupervisor() == null || student.getSupervisor().getOrganization() == null) {
-            return "PURPLE";
-        } else if (student.getSupervisor().getOrganization().getName().contains("ИТМО")) {
-            return "BLUE";
-        }
+//        if (student.getSupervisor() == null || student.getSupervisor().getOrganization() == null) {
+//            return "PURPLE";
+//        } else if (student.getSupervisor().getOrganization().getName().contains("ИТМО")) {
+//            return "BLUE";
+//        }
         return "GREEN";
     }
 
     private void fillPracticePlaceCell(Cell cell, Student student, ExcelStyleHelper styleHelper) {
-        String orgName = "--";
-        if (student.getSupervisor() != null && student.getSupervisor().getOrganization() != null) {
-            orgName = student.getSupervisor().getOrganization().getName();
-        }
-
-        cell.setCellValue(orgName);
-        cell.setCellStyle(styleHelper.getStyle(
-                Boolean.TRUE.equals(student.getIsCompanyApproved()) ? "FLAG_GREEN" : "FLAG_RED"
-        ));
+//        String orgName = "--";
+//        if (student.getSupervisor() != null && student.getSupervisor().getOrganization() != null) {
+//            orgName = student.getSupervisor().getOrganization().getName();
+//        }
+//
+//        cell.setCellValue(orgName);
+//        cell.setCellStyle(styleHelper.getStyle(
+//                Boolean.TRUE.equals(student.getIsCompanyApproved()) ? "FLAG_GREEN" : "FLAG_RED"
+//        ));
     }
 
     private void fillFlagCell(Cell cell, Boolean flag, ExcelStyleHelper styleHelper) {

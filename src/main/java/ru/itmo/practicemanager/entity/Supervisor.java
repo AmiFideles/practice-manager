@@ -15,9 +15,7 @@ public class Supervisor {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
-    String surname;
     String name;
-    String patronymic;
     String mail;
     String phone;
     @ManyToOne

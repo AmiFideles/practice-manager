@@ -1,5 +1,6 @@
 package ru.itmo.practicemanager.service.excel;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -7,8 +8,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.itmo.practicemanager.entity.Direction;
 import ru.itmo.practicemanager.entity.Student;
 import ru.itmo.practicemanager.entity.StudyGroup;
+import ru.itmo.practicemanager.repository.DirectionRepository;
 import ru.itmo.practicemanager.repository.StudyGroupRepository;
 
 import java.io.IOException;
@@ -22,6 +25,9 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ParserService {
     private final StudyGroupRepository studyGroupRepository;
+    private final DirectionRepository directionRepository;
+    private final String SOFTWARE_ENGINEERING = "09.03.04";
+    private final String COMPUTER_ENGINEERING = "09.03.01";
 
     public List<Student> parseStudentsFromExcel(MultipartFile file) {
         String html;
@@ -35,9 +41,20 @@ public class ParserService {
         List<Student> students = new ArrayList<>();
 
         String groupNumber = extractGroupNumber(doc);
+        Direction direction = determineDirectionByGroupNumber(groupNumber);
         StudyGroup group = studyGroupRepository.findByNumber(groupNumber)
-                .orElseGet(() -> studyGroupRepository.save(
-                        StudyGroup.builder().number(groupNumber).build()));
+                .orElseGet(() -> {
+                    StudyGroup newGroup = StudyGroup.builder()
+                            .number(groupNumber)
+                            .direction(direction)
+                            .build();
+                    return studyGroupRepository.save(newGroup);
+                });
+
+        if (group.getDirection() == null) {
+            group.setDirection(direction);
+            studyGroupRepository.save(group);
+        }
 
         Elements rows = doc.select("table.c14 tr");
 
@@ -70,5 +87,20 @@ public class ParserService {
             }
         }
         return "Неизвестная группа";
+    }
+
+    private Direction determineDirectionByGroupNumber(String groupNumber) {
+        if (groupNumber == null || groupNumber.length() < 3) {
+            throw new IllegalArgumentException("Некорректный номер группы: " + groupNumber);
+        }
+
+        int startIndex = groupNumber.startsWith("P") ? 1 : 0;
+        char thirdDigit = groupNumber.charAt(startIndex + 2);
+
+        String directionNumber = (thirdDigit == '3') ? COMPUTER_ENGINEERING : SOFTWARE_ENGINEERING;
+
+        return directionRepository.findByNumber(directionNumber)
+                    .orElseThrow(() -> new EntityNotFoundException(
+                        "Направление " + directionNumber + " не существует"));
     }
 }
