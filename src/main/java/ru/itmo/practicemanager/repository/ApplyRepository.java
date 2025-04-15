@@ -11,8 +11,6 @@ import java.util.Optional;
 
 public interface ApplyRepository extends JpaRepository<Apply, Long> {
     Optional<Apply> findByStudentIsuNumber(String isuNumber);
-    Optional<Apply> findByStudentUserTelegramUsername(String tgUsername);
-    List<Apply> findAllByStatus(ApplyStatus status);
 
     @Query("SELECT pa FROM Apply pa " +
             "JOIN FETCH pa.student s " +

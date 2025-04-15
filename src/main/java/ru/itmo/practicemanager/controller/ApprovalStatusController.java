@@ -57,15 +57,15 @@ public class ApprovalStatusController {
     @GetMapping("/approvals/student-status")
     public ResponseEntity<ApprovalStatusDTO> getStudentApprovalStatus(
             @Parameter(description = "Идентификатор студента (TG username или ISU номер)")
-            @RequestParam(required = false) String tgUsername,
+            @RequestParam(required = false) Long telegramId,
             @RequestParam(required = false) String isuNumber) {
 
-        if (tgUsername == null && isuNumber == null) {
+        if (telegramId == null && isuNumber == null) {
             throw new IllegalArgumentException("Должен быть указан хотя бы один идентификатор (tgUsername или isuNumber)");
         }
 
         return ResponseEntity.ok(
-                new ApprovalStatusDTO(studentService.getApprovalStatus(tgUsername, isuNumber).name())
+                new ApprovalStatusDTO(studentService.getApprovalStatus(telegramId, isuNumber).name())
         );
     }
 
@@ -118,7 +118,7 @@ public class ApprovalStatusController {
     }
 
     @Operation(
-            summary = "Изменить статус регистрации  регистрацию по ISU номеру",
+            summary = "Изменить статус регистрации по ISU номеру",
             description = "Подтверждает регистрацию студента по номеру ISU"
     )
     @PutMapping("/approvals/{isuNumber}")

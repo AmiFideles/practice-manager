@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PDFApplyService {
 
-    public byte[] generatePracticeApplicationPdf(String tgUsername) {
+    public byte[] generatePracticeApplicationPdf(Long telegramId) {
         // Логика генерации PDF будет здесь
         // 1. Поиск данных студента и заявки по tgUsername
         // 2. Формирование PDF документа

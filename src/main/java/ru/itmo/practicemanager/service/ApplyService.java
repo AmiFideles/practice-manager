@@ -28,7 +28,7 @@ public class ApplyService {
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void createOrUpdateApplication(PracticeApplicationRequest request) {
         // Находим студента по telegram username
-        Student student = studentRepository.findByUserTelegramUsername(request.getTgUsername())
+        Student student = studentRepository.findByUserTelegramId(request.getTelegramId())
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с таким телеграм именем"));
 
         // Проверяем существующую заявку

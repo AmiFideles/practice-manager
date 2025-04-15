@@ -194,11 +194,11 @@ public class StudentService {
     }
 
     @Transactional
-    public ApprovalStatus getApprovalStatus(String tgUsername, String isuNumber) {
-        if (tgUsername != null) {
-            Optional<User> byTelegramUsername = userRepository.findByTelegramUsername(tgUsername);
-            if (byTelegramUsername.isPresent()) {
-                User user = byTelegramUsername.get();
+    public ApprovalStatus getApprovalStatus(Long telegramId, String isuNumber) {
+        if (telegramId != null) {
+            Optional<User> byTelegramId = userRepository.findByTelegramId(telegramId);
+            if (byTelegramId.isPresent()) {
+                User user = byTelegramId.get();
                 return user.getStudent().getApprovalStatus();
             } else {
                 throw new EntityNotFoundException("Студент с таким именем телеграм пользователя не найден");

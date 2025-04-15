@@ -50,9 +50,9 @@ public class ApplyController {
 
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> generatePracticeApplicationPdf(
-            @RequestParam String tgUsername) {
+            @RequestParam Long telegramId) {
 
-        byte[] pdfContent = pdfApplyService.generatePracticeApplicationPdf(tgUsername);
+        byte[] pdfContent = pdfApplyService.generatePracticeApplicationPdf(telegramId);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,

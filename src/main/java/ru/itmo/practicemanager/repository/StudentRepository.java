@@ -19,9 +19,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     List<Student> findByApprovalStatus(ApprovalStatus approvalStatus);
 
-    List<Student> findStudentByStudyGroup(StudyGroup studyGroup);
-
-    Optional<Student> findByUserTelegramUsername(String telegramUsername);
+    Optional<Student> findByUserTelegramId(Long telegramId);
 
     @Query("SELECT s FROM Student s " +
             "JOIN FETCH s.studyGroup sg " +

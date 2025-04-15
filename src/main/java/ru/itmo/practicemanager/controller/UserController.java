@@ -26,9 +26,9 @@ public class UserController {
     }
 
     @GetMapping("/role")
-    public ResponseEntity<RoleDto> getRole(@RequestParam String tgUsername) {
+    public ResponseEntity<RoleDto> getRole(@RequestParam Long telegramId) {
         Optional<User> byTelegramUsername =
-                userRepository.findByTelegramUsername(tgUsername);
+                userRepository.findByTelegramId(telegramId);
         return byTelegramUsername.map(user -> ResponseEntity.ok(new RoleDto(user.getRole().name())))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

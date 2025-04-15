@@ -11,7 +11,7 @@ import ru.itmo.practicemanager.entity.PracticeType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PracticeApplicationRequest {
-    private String tgUsername;
+    private Long telegramId;
     private Long inn;
     private String organisationName;
     private String direction;
