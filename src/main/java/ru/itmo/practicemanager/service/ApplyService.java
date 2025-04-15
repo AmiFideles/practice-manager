@@ -12,10 +12,14 @@ import ru.itmo.practicemanager.repository.ApplyRepository;
 import ru.itmo.practicemanager.repository.OrganizationRepository;
 import ru.itmo.practicemanager.repository.StudentRepository;
 import ru.itmo.practicemanager.repository.SupervisorRepository;
+import ru.itmo.practicemanager.entity.CheckResult;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static ru.itmo.practicemanager.entity.ApplyStatus.APPROVED;
+import static ru.itmo.practicemanager.entity.ApplyStatus.REJECTED;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +29,10 @@ public class ApplyService {
     private final OrganizationRepository organizationRepository;
     private final SupervisorRepository supervisorRepository;
 
+    private final CompanyChecker companyChecker;
+
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void createOrUpdateApplication(PracticeApplicationRequest request) {
+    public CheckResult createOrUpdateApplication(PracticeApplicationRequest request) {
         // Находим студента по telegram username
         Student student = studentRepository.findByUserTelegramId(request.getTelegramId())
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с таким телеграм именем"));
@@ -35,7 +41,7 @@ public class ApplyService {
         Optional<Apply> existingApplication = applicationRepository.findByStudentIsuNumber(student.getIsuNumber());
         if (existingApplication.isPresent()) {
             Apply apply = existingApplication.get();
-            if (apply.getStatus().equals(ApplyStatus.APPROVED)) {
+            if (apply.getStatus().equals(APPROVED)) {
                 throw new IllegalStateException("Ваша заявка уже одобрена");
             }
             if (apply.getStatus().equals(ApplyStatus.PENDING)) {
@@ -93,17 +99,27 @@ public class ApplyService {
                             .build()));
         }
 
+        // Проверяем компанию
+        CheckResult checkResult = companyChecker.checkCompany(organization.getInn().toString(), request.getPracticeType());
+
+        ApplyStatus status = REJECTED;
+        if (checkResult.equals(CheckResult.OK)) {
+            status = APPROVED;
+        }
+
         // Создаем новую заявку
         Apply application = Apply.builder()
                 .student(student)
                 .organization(organization)
                 .supervisor(supervisor)
-                .status(ApplyStatus.PENDING)
+                .status(status)
                 .practiceType(request.getPracticeType())
                 .build();
         student.setApply(application);
         studentRepository.save(student);
         Apply saved = applicationRepository.save(application);
+
+        return checkResult;
     }
 
     @Transactional(readOnly = true)
