@@ -4,6 +4,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.List;
+
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,6 +15,13 @@ import ru.itmo.practicemanager.entity.PracticeType;
 
 @Component
 public class CompanyChecker {
+
+    /*private final ActivityRepository activityRepository;
+    private final List<String> activityCodes = activityRepository.findAll().stream()
+            .map(ActivityCode::getCode).toList();*/
+
+    private final List<String> activityCodes = List.of(new String[]{"62.01", "62.02", "62.03", "62.09", "63.11", "63.12"});
+
     public CheckStatus checkCompany(String inn, PracticeType practiceType, String name) {
         try {
             String urlString = "https://egrul.itsoft.ru/" + inn + ".json";
@@ -53,7 +62,7 @@ public class CompanyChecker {
                         return CheckStatus.INVALID_COMPANY_NAME;
                     }
 
-                    if (!hasActivity(svYul, "62.01")) {
+                    if (!hasSuitableActivity(svYul)) {
                         return CheckStatus.ACTIVITY_NOT_SUITABLE;
                     }
 
@@ -73,16 +82,16 @@ public class CompanyChecker {
                     JSONObject address = json.getJSONObject("address");
                     JSONArray okvedArray = json.getJSONArray("okved");
 
-                    boolean hasSoftwareDevelopment = false;
+                    boolean suitableActivity = false;
                     for (int i = 0; i < okvedArray.length(); i++) {
                         JSONObject okved = okvedArray.getJSONObject(i);
                         if (okved.has("code") && !okved.isNull("code") &&
-                                "62.01".equals(okved.getString("code"))) {
-                            hasSoftwareDevelopment = true;
+                                activityCodes.contains(okved.getString("code"))) {
+                            suitableActivity = true;
                             break;
                         }
                     }
-                    if (!hasSoftwareDevelopment) {
+                    if (!suitableActivity) {
                         return CheckStatus.ACTIVITY_NOT_SUITABLE;
                     }
 
@@ -136,7 +145,7 @@ public class CompanyChecker {
         return false;
     }
 
-    private boolean hasActivity(JSONObject svYul, String code) {
+    private boolean hasSuitableActivity(JSONObject svYul) {
         if (svYul.has("СвОКВЭД") && !svYul.isNull("СвОКВЭД")) {
             JSONObject svOKVED = svYul.getJSONObject("СвОКВЭД");
 
@@ -145,7 +154,7 @@ public class CompanyChecker {
                 if (svOKVEDOsn.has("@attributes") && !svOKVEDOsn.isNull("@attributes")) {
                     JSONObject attrs = svOKVEDOsn.getJSONObject("@attributes");
                     if (attrs.has("КодОКВЭД") && !attrs.isNull("КодОКВЭД") &&
-                            code.equals(attrs.getString("КодОКВЭД"))) {
+                            activityCodes.contains(attrs.getString("КодОКВЭД"))) {
                         return true;
                     }
                 }
@@ -161,7 +170,7 @@ public class CompanyChecker {
                     if (dop.has("@attributes") && !dop.isNull("@attributes")) {
                         JSONObject attrs = dop.getJSONObject("@attributes");
                         if (attrs.has("КодОКВЭД") && !attrs.isNull("КодОКВЭД") &&
-                                code.equals(attrs.getString("КодОКВЭД"))) {
+                                activityCodes.contains(attrs.getString("КодОКВЭД"))) {
                             return true;
                         }
                     }

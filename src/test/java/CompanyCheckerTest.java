@@ -1,14 +1,12 @@
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.itmo.practicemanager.entity.PracticeType;
 import ru.itmo.practicemanager.entity.CheckStatus;
+import ru.itmo.practicemanager.repository.ActivityRepository;
 import ru.itmo.practicemanager.service.CompanyChecker;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class CompanyCheckerTest {
-
     private final CompanyChecker companyChecker = new CompanyChecker();
 
     @Test

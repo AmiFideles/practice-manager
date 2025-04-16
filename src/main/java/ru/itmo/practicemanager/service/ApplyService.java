@@ -8,10 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.practicemanager.dto.PracticeApplicationDto;
 import ru.itmo.practicemanager.dto.PracticeApplicationRequest;
 import ru.itmo.practicemanager.entity.*;
-import ru.itmo.practicemanager.repository.ApplyRepository;
-import ru.itmo.practicemanager.repository.OrganizationRepository;
-import ru.itmo.practicemanager.repository.StudentRepository;
-import ru.itmo.practicemanager.repository.SupervisorRepository;
+import ru.itmo.practicemanager.repository.*;
 import ru.itmo.practicemanager.entity.CheckStatus;
 
 import java.util.List;
@@ -28,9 +25,7 @@ public class ApplyService {
     private final StudentRepository studentRepository;
     private final OrganizationRepository organizationRepository;
     private final SupervisorRepository supervisorRepository;
-
     private final CompanyChecker companyChecker;
-
     private final ContactValidator contactValidator;
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
