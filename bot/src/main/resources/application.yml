@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: StudentDistributionBot
+
+telegram-bot:
+  token: 7930668260:AAGl83IVja79YzSM3mdcsFBsMileC_GUyhI
+server:
+  port: 8081
