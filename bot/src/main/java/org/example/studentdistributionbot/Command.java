@@ -17,14 +17,17 @@ public enum Command {
     CANCEL("cancel", false, "Сбросить состояние бота, выйти из команды\n"),
     GET_REPORT("students_report", true, "Получить файл со студентами\n"),
     REJECT("reject", true, "Отказать регистрации студента.\nПример - /reject {isuNumber}\n"),
+
+    // apply-controller
     SET_REQUEST_STATUS("set_request_status", true, """
             Установить студенту статус его заявки по ISU номеру.
             Пример - /set_request_status {isuNumber} PENDING/APPROVED/REJECTED
             """),
     POST_APPLY("post_apply", false, "Создать заявку\n"),
     GET_APPLY("get_apply", true, "Получить заявки по фильтрам\n"),
-    GET_APPLY_PDF("get_apply_pdf", false, "Получить pdf\n")
-    ;
+    GET_APPLY_PDF("get_apply_pdf", false, "Получить pdf\n"),
+
+    GET_STUDENTS("get_students", true, "Получить выборку студентов по фильтрам\n");
 
 
     private final String value;

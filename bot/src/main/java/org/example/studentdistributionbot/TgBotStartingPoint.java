@@ -10,6 +10,7 @@ import org.example.studentdistributionbot.commands.approvalStatusController.GetA
 import org.example.studentdistributionbot.commands.approvalStatusController.GetApprovalsStudentStatusCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.PostApprovalsExcelCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.PutApprovalsIsuNumberHandler;
+import org.example.studentdistributionbot.commands.student_controller.GetStudentsCommandHandler;
 import org.example.studentdistributionbot.dto.*;
 import org.example.studentdistributionbot.file.BotFileHandler;
 import org.springframework.beans.factory.annotation.Value;
@@ -198,6 +199,16 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                     } catch (TelegramApiException e) {
                         log.error(e.getMessage());
                         sendMessage(userMetadata.chatId, "При заполнении фильтров что-то пошло не так");
+                    }
+                    userContextStorage.clear(userMetadata.chatId);
+                }
+                case WAITING_GET_STUDENTS_FILTERS -> {
+                    GetStudentsCommandHandler commandHandler = (GetStudentsCommandHandler) commandHandlers.get(Command.GET_STUDENTS);
+                    try {
+                        commandHandler.getStudents(update, telegramClient);
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                        sendMessage(userMetadata.chatId, "Что-то пошло не так");
                     }
                     userContextStorage.clear(userMetadata.chatId);
                 }
