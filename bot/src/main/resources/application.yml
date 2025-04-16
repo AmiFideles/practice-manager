@@ -3,6 +3,6 @@ spring:
     name: StudentDistributionBot
 
 telegram-bot:
-  token: 7930668260:AAGl83IVja79YzSM3mdcsFBsMileC_GUyhI
+  token: 7519581559:AAGY5yVvfbeULpRn20e536Ve0YP-PEZCrHk
 server:
   port: 8081

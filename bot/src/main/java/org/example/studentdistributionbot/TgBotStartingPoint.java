@@ -2,7 +2,8 @@ package org.example.studentdistributionbot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.studentdistributionbot.client.ClientFacade;
-import org.example.studentdistributionbot.commands.*;
+import org.example.studentdistributionbot.commands.BotCommandHandler;
+import org.example.studentdistributionbot.commands.LoadApproveFileHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.GetApprovalsCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.GetApprovalsStudentStatusCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.PostApprovalsExcelCommandHandler;
@@ -67,6 +68,10 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
             UserMetadata userMetadata = buildUserMetadata(update);
             log.info("Message received : '{}' from {}", userMetadata.messageText, userMetadata);
 
+            var command = userMetadata.messageText.replace("/", "").split("\\s+")[0];
+            if (command.equalsIgnoreCase(Command.CANCEL.getValue())) {
+                userContextStorage.clear(userMetadata.chatId);
+            }
             BotState userState = userContextStorage.getState(userMetadata.chatId);
 
             switch (userState) {
@@ -140,7 +145,7 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                     ApprovalStatusDTO approvalStatusDTO = new ApprovalStatusDTO(secondPart);
                     PutApprovalsIsuNumberHandler commandHandler = (PutApprovalsIsuNumberHandler) commandHandlers.get(Command.PUT_APPROVALS);
                     try {
-                        commandHandler.putApprovals(approvalStatusDTO,isuNumber, telegramClient, userMetadata.chatId);
+                        commandHandler.putApprovals(approvalStatusDTO, isuNumber, telegramClient, userMetadata.chatId);
                     } catch (Exception e) {
                         log.error(e.getMessage());
                     }
@@ -149,7 +154,7 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                 case WAITING_FOR_ISU_NUMBER_FOR_STUDENT_STATUS -> {
                     String isuNumber = update.getMessage().getText();
 
-                   GetApprovalsStudentStatusCommandHandler commandHandler = (GetApprovalsStudentStatusCommandHandler) commandHandlers.get(Command.GET_STUDENT_STATUS);
+                    GetApprovalsStudentStatusCommandHandler commandHandler = (GetApprovalsStudentStatusCommandHandler) commandHandlers.get(Command.GET_STUDENT_STATUS);
                     try {
                         commandHandler.getStudentStatus(isuNumber, telegramClient, userMetadata.chatId);
                     } catch (Exception e) {
@@ -159,7 +164,6 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                 }
                 case IDLE -> {
                     if (userMetadata.messageText.startsWith("/")) {
-                        var command = userMetadata.messageText.replace("/", "");
                         var commandHandler = commandHandlers.get(Command.fromValue(command));
 
                         if (commandHandler != null) {

@@ -13,7 +13,10 @@ public enum Command {
     LOAD_FILE_APPROVE("load_file", true, "7"),
     REGISTER("register", false, "8"),
     START("start", false, "9"),
-    HELP("help", false, "10");
+    HELP("help", false, "10"),
+    APPORVE_STUDENT("approve", true, "11"),
+    CANCEL("cancel", false, "12");
+
 
     private final String value;
     private final Boolean isAdminCommand;
