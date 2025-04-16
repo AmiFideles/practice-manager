@@ -35,4 +35,9 @@ public class Student {
 
     @OneToOne(mappedBy = "student")
     private Apply apply;
+
+    private String comment;
+
+    @Enumerated(EnumType.STRING)
+    private IndividualAssignmentStatus individualAssignmentStatus;
 }

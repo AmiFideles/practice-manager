@@ -44,7 +44,10 @@ public class ApplyService {
             if (apply.getStatus().equals(ApplyStatus.PENDING)) {
                 throw new IllegalStateException("Ваша заявка еще в состоянии обработки");
             }
-            // Удаляем старую заявку
+            student.setApply(null);
+            student = studentRepository.save(student);
+
+            // Удаляем заявку
             applicationRepository.delete(apply);
             applicationRepository.flush();
         }

@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.itmo.practicemanager.entity.IndividualAssignmentStatus;
 import ru.itmo.practicemanager.entity.Student;
 import ru.itmo.practicemanager.service.StudentReportGenerator;
 import ru.itmo.practicemanager.service.StudentService;
@@ -82,9 +83,11 @@ public class StudentController {
             @RequestParam(required = false) Boolean isStatementDelivered,
             @RequestParam(required = false) Boolean isStatementSigned,
             @RequestParam(required = false) Boolean isStatementScanned,
-            @RequestParam(required = false) Boolean isNotificationSent
+            @RequestParam(required = false) Boolean isNotificationSent,
+            @RequestParam(required = false) String comment,
+            @RequestParam(required = false) IndividualAssignmentStatus individualAssignmentStatus
     ) {
-        studentService.setStatuses(isuNumber, isStatementDelivered, isStatementSigned, isStatementScanned, isNotificationSent);
+        studentService.setStatuses(isuNumber, isStatementDelivered, isStatementSigned, isStatementScanned, isNotificationSent, comment, individualAssignmentStatus);
         return ResponseEntity.ok().build();
     }
 }

@@ -13,6 +13,7 @@ import ru.itmo.practicemanager.entity.PracticeType;
 public class PracticeApplicationDto {
     private Long id;
     private String status;
+    private String checkStatus;
     private String isuNumber;
     private String studentName;
     private String groupNumber;

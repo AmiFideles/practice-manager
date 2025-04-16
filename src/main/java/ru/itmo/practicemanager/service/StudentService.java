@@ -94,7 +94,9 @@ public class StudentService {
             Boolean isStatementDelivered,
             Boolean isStatementSigned,
             Boolean isStatementScanned,
-            Boolean isNotificationSent
+            Boolean isNotificationSent,
+            String comment,
+            IndividualAssignmentStatus individualAssignmentStatus
     ) {
         Student student = studentRepository.findByIsuNumber(studentIsuNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Студент с isu " + studentIsuNumber + " не найден"));
@@ -113,6 +115,14 @@ public class StudentService {
 
         if (isNotificationSent != null) {
             student.setIsNotificationSent(isNotificationSent);
+        }
+
+        if (comment != null) {
+            student.setComment(comment);
+        }
+
+        if (individualAssignmentStatus != null) {
+            student.setIndividualAssignmentStatus(individualAssignmentStatus);
         }
 
         studentRepository.save(student);

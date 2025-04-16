@@ -1,29 +1,42 @@
 package ru.itmo.practicemanager.service;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.List;
-
-import org.json.JSONObject;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.springframework.stereotype.Component;
+import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+import ru.itmo.practicemanager.entity.ActivityCode;
 import ru.itmo.practicemanager.entity.CheckStatus;
 import ru.itmo.practicemanager.entity.PracticeType;
+import ru.itmo.practicemanager.repository.ActivityRepository;
 
-@Component
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
 public class CompanyChecker {
 
-    /*private final ActivityRepository activityRepository;
-    private final List<String> activityCodes = activityRepository.findAll().stream()
-            .map(ActivityCode::getCode).toList();*/
+    private final ActivityRepository activityRepository;
+    private List<String> activityCodes;
 
-    private final List<String> activityCodes = List.of(new String[]{"62.01", "62.02", "62.03", "62.09", "63.11", "63.12"});
+    @PostConstruct
+    public void init() {
+        activityCodes = activityRepository.findAll().stream()
+                .map(ActivityCode::getCode)
+                .toList();
+    }
+
+//    private final List<String> activityCodes = List.of(new String[]{"62.01", "62.02", "62.03", "62.09", "63.11", "63.12"});
 
     public CheckStatus checkCompany(String inn, PracticeType practiceType, String name) {
         try {
+            List<String> activityCodes = activityRepository.findAll().stream()
+                    .map(ActivityCode::getCode).toList();
             String urlString = "https://egrul.itsoft.ru/" + inn + ".json";
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
