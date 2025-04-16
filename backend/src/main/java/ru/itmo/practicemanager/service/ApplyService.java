@@ -118,7 +118,7 @@ public class ApplyService {
 
             status = REJECTED;
             if (checkStatus.equals(CheckStatus.API_ERROR) || checkStatus.equals(CheckStatus.JSON_PARSING_ERROR) ) {
-                status = PENDING;
+                status = ApplyStatus.PENDING;
             }
             else if (checkStatus.equals(CheckStatus.OK)) {
                 status = APPROVED;
