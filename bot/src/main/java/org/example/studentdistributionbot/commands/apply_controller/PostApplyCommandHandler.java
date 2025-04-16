@@ -1,15 +1,12 @@
-package org.example.studentdistributionbot.commands.aply_controller;
+package org.example.studentdistributionbot.commands.apply_controller;
 
 
 import lombok.RequiredArgsConstructor;
 import org.example.studentdistributionbot.BotState;
 import org.example.studentdistributionbot.Command;
 import org.example.studentdistributionbot.UserContextStorage;
-import org.example.studentdistributionbot.client.UserRoleResolverClient;
-import org.example.studentdistributionbot.client.aply_controller.PostApplyClient;
-import org.example.studentdistributionbot.client.approvalStatusController.GetApprovalsClient;
+import org.example.studentdistributionbot.client.apply_controller.PostApplyClient;
 import org.example.studentdistributionbot.commands.BotCommandHandler;
-import org.example.studentdistributionbot.dto.ApprovalStatusDTO;
 import org.example.studentdistributionbot.dto.PracticeApplicationRequest;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -20,7 +17,6 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 @RequiredArgsConstructor
 public class PostApplyCommandHandler implements BotCommandHandler {
     private final UserContextStorage userContextStorage;
-    private final UserRoleResolverClient userRoleResolverClient;
     private final PostApplyClient postApplyClient;
 
     @Override
@@ -30,7 +26,6 @@ public class PostApplyCommandHandler implements BotCommandHandler {
 
     @Override
     public void handleCommand(Update update, TelegramClient client) throws TelegramApiException {
-
         Long chatId = update.getMessage().getChatId();
         userContextStorage.setState(chatId, BotState.WAITING_FOR_PRACTICE_APPLICATION);
         sendMessage(chatId, client, "Введите ИНН ,Название организации, Город, ФИО руководителя, mail, телефон, тип практики ONLINE или OFFLINE, одним сообщением с переводом строки");

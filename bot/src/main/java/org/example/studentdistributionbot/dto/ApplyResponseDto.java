@@ -1,27 +1,20 @@
-package ru.itmo.practicemanager.dto;
+package org.example.studentdistributionbot.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import ru.itmo.practicemanager.entity.PracticeType;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class PracticeApplicationDto {
+public class ApplyResponseDto {
     private Long id;
     private String status;
     private String checkStatus;
     private String isuNumber;
     private String studentName;
     private String groupNumber;
-    private Long inn;
+    private String inn;
     private String organisationName;
     private String location;
     private String supervisorName;
     private String mail;
     private String phone;
-    private PracticeType practiceType;
+    private String practiceType;
 }

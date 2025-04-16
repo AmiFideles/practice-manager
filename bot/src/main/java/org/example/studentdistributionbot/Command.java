@@ -15,14 +15,16 @@ public enum Command {
     START("start", false, "Стратовая команда\n"),
     HELP("help", false, "Помощь\n"),
     APPROVE_STUDENT("approve", true, "Аппрувнуть регистрацию студента.\nПример - /approve {isuNumber}\n"),
-    CANCEL("cancel", false, "Сбросить состояние бота\n"),
+    CANCEL("cancel", false, "Сбросить состояние бота, выйти из команды\n"),
     GET_REPORT("students_report", true, "Получить файл со студентами\n"),
     REJECT("reject", true, "Отказать регистрации студента.\nПример - /reject {isuNumber}\n"),
     SET_REQUEST_STATUS("set_request_status", true, """
             Установить студенту статус его заявки по ISU номеру.
             Пример - /set_request_status {isuNumber} PENDING/APPROVED/REJECTED
             """),
-    POST_APPLY("post_apply", false, "Создать заявку"),
+    POST_APPLY("post_apply", false, "Создать заявку\n"),
+    GET_APPLY("get_apply", true, "Получить заявки по фильтрам\n"),
+    GET_APPLY_PDF("get_apply_pdf", false, "Получить pdf\n")
     ;
 
 
