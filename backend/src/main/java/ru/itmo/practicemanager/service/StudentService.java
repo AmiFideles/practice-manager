@@ -139,7 +139,7 @@ public class StudentService {
                 "Проверьте ФИО, номер ИСУ"));
 
         if (student.getUser() != null) {
-            throw new RegistrationException("Этот студент уже зарегистрирован");
+            throw new RegistrationException("Этот пользователь уже зарегистрирован");
         }
 
         User user = User.builder()
