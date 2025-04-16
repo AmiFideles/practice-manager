@@ -21,7 +21,7 @@ public class ApproveStudentHandler implements BotCommandHandler {
 
     @Override
     public Command getCommand() {
-        return Command.APPROVE_STUDENT;
+        return Command.APPORVE_STUDENT;
     }
 
     @Override

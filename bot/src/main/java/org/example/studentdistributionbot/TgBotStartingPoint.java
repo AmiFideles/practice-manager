@@ -91,7 +91,7 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                     String[] values = text.split("\\r?\\n");
                     PracticeApplicationRequest practiceApplicationRequest = new PracticeApplicationRequest();
                     practiceApplicationRequest.setTelegramId(userMetadata.telegramId);
-                    practiceApplicationRequest.setInn(Long.getLong(values[0]));
+                    practiceApplicationRequest.setInn(Long.parseLong(values[0]));
                     practiceApplicationRequest.setOrganisationName(values[1]);
                     practiceApplicationRequest.setLocation(values[2]);
                     practiceApplicationRequest.setSupervisorName(values[3]);
@@ -104,6 +104,7 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                         commandHandler.postApply(practiceApplicationRequest, telegramClient, userMetadata.chatId);
                     } catch (Exception e) {
                         log.error(e.getMessage());
+                        sendMessage(userMetadata.chatId, e.getMessage());
                     }
                 }
                 case WAITING_FOR_FULL_NAME -> {

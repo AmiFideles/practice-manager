@@ -15,10 +15,11 @@ public enum Command {
     REGISTER("register", false, "Регистрация студента"),
     START("start", false, "Стратовая команда"),
     HELP("help", false, "Помощь"),
-    APPORVE_STUDENT("approve", true, "Аппрувнуть регистрацию студента. `/approve {isuNumber}`"),
+    APPORVE_STUDENT("approve", true, "Апрувнуть регистрацию студента. `/approve {isuNumber}`"),
     CANCEL("cancel", false, "Сбросить состояние бота"),
     GET_REPORT("students_report", true, "Получить файл со студентами"),
-    REJECT("reject", true, "Отказать регистрации студента. `/reject {isuNumber}`");
+    REJECT("reject", true, "Отказать регистрации студента. `/reject {isuNumber}`"),
+    SET_REQUEST_STATUS("set_request_status", true, "Установить студенту статус его заявки по ISU номеру\n");
 
 
     private final String value;
