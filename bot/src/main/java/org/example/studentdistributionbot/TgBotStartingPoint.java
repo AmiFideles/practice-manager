@@ -168,17 +168,16 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                 }
                 case IDLE -> {
                     if (userMetadata.messageText.startsWith("/")) {
-                        var command = userMetadata.messageText.replace("/", "").split("\\s+")[0];
-                        var commandHandler = commandHandlers.get(Command.fromValue(command));
-
-                        if (commandHandler != null) {
-                            try {
-                                commandHandler.handleCommand(update, telegramClient);
-                            } catch (Exception e) {
-                                log.error(e.getMessage());
-                            }
-                        } else {
-                            log.warn("Неизвестная команда: {}", command);
+                        String command = userMetadata.messageText.replace("/", "").split("\\s+")[0];
+                        try {
+                            var commandHandler = commandHandlers.get(Command.fromValue(command));
+                            commandHandler.handleCommand(update, telegramClient);
+                        } catch (IllegalArgumentException e) {
+                            log.error(e.getMessage());
+                            sendMessage(userMetadata.chatId, "Неизвестная команда /%s".formatted(command));
+                        } catch (Exception e) {
+                            log.error(e.getMessage());
+                            sendMessage(userMetadata.chatId, "Неизвестная ошибка");
                         }
                     }
                 }

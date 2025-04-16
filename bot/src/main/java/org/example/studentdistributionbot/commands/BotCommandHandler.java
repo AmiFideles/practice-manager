@@ -18,4 +18,13 @@ public interface BotCommandHandler {
                 .build();
         telegramClient.execute(sendMessage);
     }
+
+    default void sendMessageFormatted(Long chatId, TelegramClient telegramClient, String message) throws TelegramApiException {
+        SendMessage sendMessage = SendMessage.builder()
+                .chatId(chatId)
+                .text(message)
+                .parseMode("Markdown")
+                .build();
+        telegramClient.execute(sendMessage);
+    }
 }
