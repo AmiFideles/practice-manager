@@ -1,4 +1,11 @@
 services:
+  bot:
+    build: .
+    container_name: spring-bot
+    ports:
+      - "8081:8080"
+    restart: always
+
   db:
     image: postgres:latest
     environment:
