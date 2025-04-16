@@ -55,7 +55,7 @@ public class ApplyService {
         }
 
         // Создаем или находим организацию
-        Supervisor supervisor = null;
+        Supervisor supervisor;
         Organization organization;
 
         ApplyStatus status;
@@ -65,7 +65,28 @@ public class ApplyService {
             organization = organizationRepository.findByName("ИТМО")
                     .orElseThrow(() -> new EntityNotFoundException("Организация ИТМО не найдена"));
 
-            if (request.getSupervisorName() != null && !request.getSupervisorName().isBlank()) {
+            checkStatus = OK;
+            status = APPROVED;
+
+            if (request.getSupervisorName() == null || request.getSupervisorName().isBlank()) {
+                Optional<Supervisor> byMail = supervisorRepository.findByMail("Маркина Т.А.");
+                supervisor = byMail.orElseGet(() -> supervisorRepository.save(
+                        Supervisor.builder()
+                                .name("Маркина Т.А.")
+                                .mail(null)
+                                .phone(null)
+                                .organization(organization)
+                                .build()));
+            } else {
+                if (!contactValidator.isValidEmail(request.getMail())) {
+                    checkStatus = CheckStatus.INVALID_EMAIL;
+                    status = REJECTED;
+                }
+                else if (!contactValidator.isValidPhoneNumber(request.getPhone())) {
+                    checkStatus = CheckStatus.INVALID_PHONE;
+                    status = REJECTED;
+                }
+
                 Optional<Supervisor> byMail = supervisorRepository.findByMail(request.getSupervisorName());
                 supervisor = byMail.orElseGet(() -> supervisorRepository.save(
                         Supervisor.builder()
@@ -75,9 +96,6 @@ public class ApplyService {
                                 .organization(organization)
                                 .build()));
             }
-
-            checkStatus = OK;
-            status = APPROVED;
 
         } else {
             // Для внешних организаций
