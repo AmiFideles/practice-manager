@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum Command {
     GET_APPROVALS("get_approvals", true, "Получить студентов по статусу регистрации\n"),
     GET_APPROVALS_EXCEL("get_approvals_excel", true, "Скачать шаблон для подтверждения\n"),
+    GET_EXCEL_REPORT("get_excel_report", true, "Скачать отчет по студентам\n"),
     POST_APPROVALS_EXCEL("post_approvals_excel", true, "Загрузить подтверждения\n"),
     PUT_APPROVALS("put_approvals", true, "Изменить статус регистрации по ISU номеру\n"),
     GET_STUDENT_STATUS("get_student_status", true, "Получить статус регистрации студента\n"),
