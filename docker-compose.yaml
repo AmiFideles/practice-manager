@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: practice
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - practice-net
+
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://postgres:5432/practice
+      DATASOURCE_USERNAME: postgres
+      DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - practice-net
+
+  # bot:
+  #   build:
+  #     context: ./bot
+  #   container_name: bot
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - practice-net
+
+volumes:
+  postgres-data:
+
+networks:
+  practice-net:
+    driver: bridge
