@@ -28,7 +28,7 @@ public class RegisterStudentClient {
         }
     }
 
-    public String approveStudent(String isuNumber, ApprovalStatusDTO status) {
+    public String changeStatusStudent(String isuNumber, ApprovalStatusDTO status) {
         try {
             return webClient.put()
                     .uri(uriBuilder -> uriBuilder.path("/api/approvals/{isuNumber}")

@@ -4,18 +4,20 @@ import lombok.Getter;
 
 @Getter
 public enum Command {
-    GET_APPROVALS("get_approvals", true, "1"),
-    GET_APPROVALS_STATUS("get_approvals_status", true, "2"),
-    GET_APPROVALS_EXCEL("get_approvals_excel", true, "3"),
-    POST_APPROVALS_EXCEL("post_approvals_excel", true, "4"),
-    PUT_APPROVALS("put_approvals", true, "5"),
-    GET_STUDENT_STATUS("get_student_status", true, "6"),
-    LOAD_FILE_APPROVE("load_file", true, "7"),
-    REGISTER("register", false, "8"),
-    START("start", false, "9"),
-    HELP("help", false, "10"),
-    APPORVE_STUDENT("approve", true, "11"),
-    CANCEL("cancel", false, "12");
+    GET_APPROVALS("get_approvals", true, "Получить студентов по статусу регистрации"),
+    GET_APPROVALS_STATUS("get_approvals_status", true, "Возвращает список доступных статусов регистрации"),
+    GET_APPROVALS_EXCEL("get_approvals_excel", true, "Скачать шаблон для подтверждения"),
+    POST_APPROVALS_EXCEL("post_approvals_excel", true, "Загрузить подтверждения"),
+    PUT_APPROVALS("put_approvals", true, "Изменить статус регистрации по ISU номеру"),
+    GET_STUDENT_STATUS("get_student_status", true, "Получить статус регистрации студента"),
+    LOAD_FILE_APPROVE("load_file", true, "Загрузить файл со студентами"),
+    REGISTER("register", false, "Регистрация студента"),
+    START("start", false, "Стратовая команда"),
+    HELP("help", false, "Помощь"),
+    APPORVE_STUDENT("approve", true, "Аппрувнуть регистрацию студента. `/approve {isuNumber}`"),
+    CANCEL("cancel", false, "Сбросить состояние бота"),
+    GET_REPORT("students_report", true, "Получить файл со студентами"),
+    REJECT("reject", true, "Отказать регистрации студента. `/reject {isuNumber}`");
 
 
     private final String value;
