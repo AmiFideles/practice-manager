@@ -1,4 +1,4 @@
-package org.example.studentdistributionbot.client.aply_controller;
+package org.example.studentdistributionbot.client.apply_controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
