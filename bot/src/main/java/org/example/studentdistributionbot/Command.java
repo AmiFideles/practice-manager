@@ -11,6 +11,7 @@ public enum Command {
     PUT_APPROVALS("put_approvals", true, "Изменить статус регистрации по ISU номеру"),
     GET_STUDENT_STATUS("get_student_status", true, "Получить статус регистрации студента"),
     LOAD_FILE_APPROVE("load_file", true, "Загрузить файл со студентами"),
+    POST_APPLY("post_apply", false, "Создать заявку"),
     REGISTER("register", false, "Регистрация студента"),
     START("start", false, "Стратовая команда"),
     HELP("help", false, "Помощь"),

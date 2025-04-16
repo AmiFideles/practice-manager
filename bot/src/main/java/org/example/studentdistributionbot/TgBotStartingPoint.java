@@ -4,13 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.studentdistributionbot.client.ClientFacade;
 import org.example.studentdistributionbot.commands.BotCommandHandler;
 import org.example.studentdistributionbot.commands.LoadApproveFileHandler;
+import org.example.studentdistributionbot.commands.aply_controller.PostApplyCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.GetApprovalsCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.GetApprovalsStudentStatusCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.PostApprovalsExcelCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.PutApprovalsIsuNumberHandler;
-import org.example.studentdistributionbot.dto.ApprovalStatusDTO;
-import org.example.studentdistributionbot.dto.GetApprovalsDto;
-import org.example.studentdistributionbot.dto.UserRole;
+import org.example.studentdistributionbot.dto.*;
 import org.example.studentdistributionbot.file.BotFileHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -86,6 +85,26 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                     registerDto.setTelegramId(userMetadata.telegramId);
                     userContextStorage.setState(userMetadata.chatId, BotState.WAITING_FOR_FULL_NAME);
                     sendMessage(userMetadata.chatId, "Введите ФИО");
+                }
+                case WAITING_FOR_PRACTICE_APPLICATION -> {
+                    String text = update.getMessage().getText();
+                    String[] values = text.split("\\r?\\n");
+                    PracticeApplicationRequest practiceApplicationRequest = new PracticeApplicationRequest();
+                    practiceApplicationRequest.setTelegramId(userMetadata.telegramId);
+                    practiceApplicationRequest.setInn(Long.getLong(values[0]));
+                    practiceApplicationRequest.setOrganisationName(values[1]);
+                    practiceApplicationRequest.setLocation(values[2]);
+                    practiceApplicationRequest.setSupervisorName(values[3]);
+                    practiceApplicationRequest.setMail(values[4]);
+                    practiceApplicationRequest.setPhone(values[5]);
+                    practiceApplicationRequest.setPracticeType(PracticeType.fromValue(values[6]));
+
+                    PostApplyCommandHandler commandHandler = (PostApplyCommandHandler) commandHandlers.get(Command.POST_APPLY);
+                    try {
+                        commandHandler.postApply(practiceApplicationRequest, telegramClient, userMetadata.chatId);
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                    }
                 }
                 case WAITING_FOR_FULL_NAME -> {
                     userContextStorage.getData(userMetadata.chatId).setFullName(userMetadata.messageText);
