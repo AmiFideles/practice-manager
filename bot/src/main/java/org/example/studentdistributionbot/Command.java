@@ -22,7 +22,8 @@ public enum Command {
             Пример - /set_request_status {isuNumber} PENDING/APPROVED/REJECTED
             """),
     POST_APPLY("post_apply", false, "Создать заявку\n"),
-    GET_APPLY("get_apply", true, "Получить заявки по фильтрам")
+    GET_APPLY("get_apply", true, "Получить заявки по фильтрам\n"),
+    GET_APPLY_PDF("get_apply_pdf", false, "Получить pdf\n")
     ;
 
 
