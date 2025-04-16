@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class SetStatusesStudentRequestClient {
 
-    private WebClient webClient;
+    private final WebClient webClient;
 
     public String setStatus(ApplyStatus applyStatus, String isuNumber) {
         try {

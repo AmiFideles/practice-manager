@@ -4,22 +4,23 @@ import lombok.Getter;
 
 @Getter
 public enum Command {
-    GET_APPROVALS("get_approvals", true, "Получить студентов по статусу регистрации"),
-    GET_APPROVALS_STATUS("get_approvals_status", true, "Возвращает список доступных статусов регистрации"),
-    GET_APPROVALS_EXCEL("get_approvals_excel", true, "Скачать шаблон для подтверждения"),
-    POST_APPROVALS_EXCEL("post_approvals_excel", true, "Загрузить подтверждения"),
-    PUT_APPROVALS("put_approvals", true, "Изменить статус регистрации по ISU номеру"),
-    GET_STUDENT_STATUS("get_student_status", true, "Получить статус регистрации студента"),
-    LOAD_FILE_APPROVE("load_file", true, "Загрузить файл со студентами"),
-    POST_APPLY("post_apply", false, "Создать заявку"),
-    REGISTER("register", false, "Регистрация студента"),
-    START("start", false, "Стратовая команда"),
-    HELP("help", false, "Помощь"),
-    APPORVE_STUDENT("approve", true, "Апрувнуть регистрацию студента. `/approve {isuNumber}`"),
-    CANCEL("cancel", false, "Сбросить состояние бота"),
-    GET_REPORT("students_report", true, "Получить файл со студентами"),
-    REJECT("reject", true, "Отказать регистрации студента. `/reject {isuNumber}`"),
-    SET_REQUEST_STATUS("set_request_status", true, "Установить студенту статус его заявки по ISU номеру\n");
+    GET_APPROVALS("get_approvals", true, "Получить студентов по статусу регистрации\n"),
+    GET_APPROVALS_EXCEL("get_approvals_excel", true, "Скачать шаблон для подтверждения\n"),
+    POST_APPROVALS_EXCEL("post_approvals_excel", true, "Загрузить подтверждения\n"),
+    PUT_APPROVALS("put_approvals", true, "Изменить статус регистрации по ISU номеру\n"),
+    GET_STUDENT_STATUS("get_student_status", true, "Получить статус регистрации студента\n"),
+    LOAD_FILE_APPROVE("load_file", true, "Загрузить файл со студентами\n"),
+    REGISTER("register", false, "Регистрация студента\n"),
+    START("start", false, "Стратовая команда\n"),
+    HELP("help", false, "Помощь\n"),
+    APPROVE_STUDENT("approve", true, "Аппрувнуть регистрацию студента.\nПример - /approve {isuNumber}\n"),
+    CANCEL("cancel", false, "Сбросить состояние бота\n"),
+    GET_REPORT("students_report", true, "Получить файл со студентами\n"),
+    REJECT("reject", true, "Отказать регистрации студента.\nПример - /reject {isuNumber}\n"),
+    SET_REQUEST_STATUS("set_request_status", true, """
+            Установить студенту статус его заявки по ISU номеру.
+            Пример - /set_request_status {isuNumber} PENDING/APPROVED/REJECTED
+            """);
 
 
     private final String value;

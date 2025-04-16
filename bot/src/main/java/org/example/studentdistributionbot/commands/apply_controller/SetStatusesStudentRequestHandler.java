@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.studentdistributionbot.Command;
 import org.example.studentdistributionbot.client.apply_controller.SetStatusesStudentRequestClient;
 import org.example.studentdistributionbot.commands.BotCommandHandler;
+import org.example.studentdistributionbot.dto.ApplyStatus;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -24,6 +25,14 @@ public class SetStatusesStudentRequestHandler implements BotCommandHandler {
 
     @Override
     public void handleCommand(Update update, TelegramClient client) throws TelegramApiException {
-//        setStatusesStudentRequestClient.setStatus();
+        String message = update.getMessage().getText();
+        String[] tokens = message.split("\\s+");
+        if (tokens.length != 3) {
+            sendMessage(update.getMessage().getChatId(), client, "Введите команду правильно: /%s {isuNumber} PENDING/APPROVED/REJECTED".formatted(getCommand().getValue()));
+            return;
+        }
+
+        var response = setStatusesStudentRequestClient.setStatus(ApplyStatus.fromValue(tokens[2]), tokens[1]);
+        sendMessage(update.getMessage().getChatId(), client, response);
     }
 }
