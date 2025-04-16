@@ -24,7 +24,7 @@ public class ApplyController {
     private final ApplyService applyService;
     private final PDFApplyService pdfApplyService;
 
-    @Operation(summary = "Создать заявку")
+    @Operation(summary = "Создать заявку на согласование компании.")
     @PostMapping
     public ResponseEntity<?> createApplication(
             @RequestBody PracticeApplicationRequest request) {
@@ -51,7 +51,7 @@ public class ApplyController {
         };
     }
 
-    @Operation(summary = "Получить выборку студентов по заданным фильтрам. Фильтры могут комбинироваться.")
+    @Operation(summary = "Получить выборку заявок на согласование по заданным фильтрам. Фильтры могут комбинироваться.")
     @GetMapping
     public ResponseEntity<List<PracticeApplicationDto>> getApplications(
             @RequestParam(required = false) ApplyStatus status,
