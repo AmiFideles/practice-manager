@@ -108,7 +108,6 @@ public class ApplyService {
                             Organization.builder()
                                     .inn(request.getInn())
                                     .name(request.getOrganisationName())
-                                    .direction(request.getDirection())
                                     .location(request.getLocation())
                                     .build()));
 
@@ -198,7 +197,6 @@ public class ApplyService {
                 .groupNumber(application.getStudent().getStudyGroup().getNumber())
                 .inn(application.getOrganization().getInn())
                 .organisationName(application.getOrganization().getName())
-                .direction(application.getOrganization().getDirection())
                 .location(application.getOrganization().getLocation())
                 .supervisorName(application.getSupervisor().getName())
                 .mail(application.getSupervisor() != null ? application.getSupervisor().getMail() : null)
