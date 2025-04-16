@@ -13,7 +13,7 @@ import ru.itmo.practicemanager.dto.PracticeApplicationRequest;
 import ru.itmo.practicemanager.entity.ApplyStatus;
 import ru.itmo.practicemanager.entity.CheckStatus;
 import ru.itmo.practicemanager.service.ApplyService;
-import ru.itmo.practicemanager.service.PDFApplyService;
+import ru.itmo.practicemanager.service.pdf.PDFApplyService;
 
 import java.util.List;
 
