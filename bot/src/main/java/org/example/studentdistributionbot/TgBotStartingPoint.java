@@ -68,10 +68,13 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
             UserMetadata userMetadata = buildUserMetadata(update);
             log.info("Message received : '{}' from {}", userMetadata.messageText, userMetadata);
 
-            var command = userMetadata.messageText.replace("/", "").split("\\s+")[0];
-            if (command.equalsIgnoreCase(Command.CANCEL.getValue())) {
-                userContextStorage.clear(userMetadata.chatId);
+            if (update.getMessage().hasText()) {
+                var command = userMetadata.messageText.replace("/", "").split("\\s+")[0];
+                if (command.equalsIgnoreCase(Command.CANCEL.getValue())) {
+                    userContextStorage.clear(userMetadata.chatId);
+                }
             }
+
             BotState userState = userContextStorage.getState(userMetadata.chatId);
 
             switch (userState) {
@@ -164,6 +167,7 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                 }
                 case IDLE -> {
                     if (userMetadata.messageText.startsWith("/")) {
+                        var command = userMetadata.messageText.replace("/", "").split("\\s+")[0];
                         var commandHandler = commandHandlers.get(Command.fromValue(command));
 
                         if (commandHandler != null) {
