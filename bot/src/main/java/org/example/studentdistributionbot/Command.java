@@ -9,6 +9,7 @@ public enum Command {
     POST_APPROVALS_EXCEL("post_approvals_excel", true, "Загрузить подтверждения\n"),
     PUT_APPROVALS("put_approvals", true, "Изменить статус регистрации по ISU номеру\n"),
     GET_STUDENT_STATUS("get_student_status", true, "Получить статус регистрации студента\n"),
+    GET_STUDENT_STATUS_ISU_NUMBER("get_student_status_isu_number", true, "Получить студента по его ИСУ\n"),
     LOAD_FILE_APPROVE("load_file", true, "Загрузить файл со студентами\n"),
     REGISTER("register", false, "Регистрация студента\n"),
     START("start", false, "Стратовая команда\n"),

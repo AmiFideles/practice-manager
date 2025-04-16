@@ -9,6 +9,7 @@ import org.example.studentdistributionbot.commands.approvalStatusController.GetA
 import org.example.studentdistributionbot.commands.approvalStatusController.GetApprovalsStudentStatusCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.PostApprovalsExcelCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.PutApprovalsIsuNumberHandler;
+import org.example.studentdistributionbot.commands.student_controller.GetStudentsIsuNumberHandler;
 import org.example.studentdistributionbot.dto.*;
 import org.example.studentdistributionbot.file.BotFileHandler;
 import org.springframework.beans.factory.annotation.Value;
@@ -181,6 +182,17 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                     GetApprovalsStudentStatusCommandHandler commandHandler = (GetApprovalsStudentStatusCommandHandler) commandHandlers.get(Command.GET_STUDENT_STATUS);
                     try {
                         commandHandler.getStudentStatus(isuNumber, telegramClient, userMetadata.chatId);
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                    }
+                    userContextStorage.clear(userMetadata.chatId);
+                }
+                case WAITING_FOR_ISU_NUMBER_FOR_GET_STUDENT_STATUS -> {
+                    String isuNumber = update.getMessage().getText();
+
+                    GetStudentsIsuNumberHandler commandHandler = (GetStudentsIsuNumberHandler) commandHandlers.get(Command.GET_STUDENT_STATUS_ISU_NUMBER);
+                    try {
+                        commandHandler.getStudentIsuNumber(isuNumber, telegramClient, userMetadata.chatId);
                     } catch (Exception e) {
                         log.error(e.getMessage());
                     }
