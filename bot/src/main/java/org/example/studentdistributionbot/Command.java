@@ -20,7 +20,9 @@ public enum Command {
     SET_REQUEST_STATUS("set_request_status", true, """
             Установить студенту статус его заявки по ISU номеру.
             Пример - /set_request_status {isuNumber} PENDING/APPROVED/REJECTED
-            """);
+            """),
+    POST_APPLY("post_apply", false, "Создать заявку"),
+    ;
 
 
     private final String value;
