@@ -6,10 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.itmo.practicemanager.dto.ErrorResponse;
 import ru.itmo.practicemanager.dto.PracticeApplicationDto;
 import ru.itmo.practicemanager.dto.PracticeApplicationRequest;
 import ru.itmo.practicemanager.entity.ApplyStatus;
-import ru.itmo.practicemanager.entity.CheckResult;
+import ru.itmo.practicemanager.entity.CheckStatus;
 import ru.itmo.practicemanager.service.ApplyService;
 import ru.itmo.practicemanager.service.PDFApplyService;
 
@@ -25,20 +26,26 @@ public class ApplyController {
     @PostMapping
     public ResponseEntity<?> createApplication(
             @RequestBody PracticeApplicationRequest request) {
-        CheckResult checkResult = applyService.createOrUpdateApplication(request);
+        CheckStatus checkStatus = applyService.createOrUpdateApplication(request);
 
-        return switch (checkResult) {
-            case OK -> ResponseEntity.ok().body("Company is valid");
+        return switch (checkStatus) {
+            case OK -> ResponseEntity.ok().build();
             case COMPANY_NOT_FOUND -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Company with INN or OGRN " + request.getInn() + " not found");
+                    .body(new ErrorResponse("Организация с ИНН или ОГРН " + request.getInn() + " не найдена"));
             case ACTIVITY_NOT_SUITABLE -> ResponseEntity.badRequest()
-                    .body("Company does not have required activity (Разработка программного обеспечения)");
+                    .body(new ErrorResponse("Организация не имеет IT виды деятельности среди основного или дополнительных"));
             case LOCATION_NOT_SUITABLE -> ResponseEntity.badRequest()
-                    .body("Company is not located in Saint Petersburg although the practice type is offline");
+                    .body(new ErrorResponse("Организация не располагается в Санкт-Петербурге, хотя формат практики очный"));
             case API_ERROR -> ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .body("Failed to access API, please try again later (maybe the number of requests from one IP address per day has been exceeded 1000)");
+                    .body(new ErrorResponse("Ошибка обращения к внешнему API (возможно, превышен лимит 1000 запросов в день)"));
             case JSON_PARSING_ERROR -> ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                    .body("Invalid response format from API");
+                    .body(new ErrorResponse("Невалидный ответ от внешнего API"));
+            case INVALID_COMPANY_NAME -> ResponseEntity.badRequest()
+                    .body(new ErrorResponse("Имя компании не соответствует официальному"));
+            case INVALID_EMAIL -> ResponseEntity.badRequest()
+                    .body(new ErrorResponse("Невалидный email"));
+            case INVALID_PHONE -> ResponseEntity.badRequest()
+                    .body(new ErrorResponse("Невалидный номер телефона"));
         };
     }
 

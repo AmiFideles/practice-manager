@@ -8,12 +8,12 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.springframework.stereotype.Component;
-import ru.itmo.practicemanager.entity.CheckResult;
+import ru.itmo.practicemanager.entity.CheckStatus;
 import ru.itmo.practicemanager.entity.PracticeType;
 
 @Component
 public class CompanyChecker {
-    public CheckResult checkCompany(String inn, PracticeType practiceType) {
+    public CheckStatus checkCompany(String inn, PracticeType practiceType, String name) {
         try {
             String urlString = "https://egrul.itsoft.ru/" + inn + ".json";
             URL url = new URL(urlString);
@@ -24,10 +24,10 @@ public class CompanyChecker {
             int responseCode = conn.getResponseCode();
 
             if (responseCode == 404) {
-                return CheckResult.COMPANY_NOT_FOUND;
+                return CheckStatus.COMPANY_NOT_FOUND;
             }
             if (responseCode != 200) {
-                return CheckResult.API_ERROR;
+                return CheckStatus.API_ERROR;
             }
 
             try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
@@ -42,23 +42,34 @@ public class CompanyChecker {
                 try {
                     json = new JSONObject(content.toString());
                 } catch (JSONException e) {
-                    return CheckResult.JSON_PARSING_ERROR;
+                    return CheckStatus.JSON_PARSING_ERROR;
                 }
 
                 if (json.has("СвЮЛ")) {
                     JSONObject svYul = json.getJSONObject("СвЮЛ");
 
+                    // Проверка имени компании
+                    if (!hasValidName(svYul, name)) {
+                        return CheckStatus.INVALID_COMPANY_NAME;
+                    }
+
                     if (!hasActivity(svYul, "62.01")) {
-                        return CheckResult.ACTIVITY_NOT_SUITABLE;
+                        return CheckStatus.ACTIVITY_NOT_SUITABLE;
                     }
 
                     if (practiceType == PracticeType.OFFLINE && !isFromSPB(svYul)) {
-                        return CheckResult.LOCATION_NOT_SUITABLE;
+                        return CheckStatus.LOCATION_NOT_SUITABLE;
                     }
 
-                    return CheckResult.OK;
+                    return CheckStatus.OK;
                 }
-                else if (json.has("address") && json.has("okved")) {
+                else if (json.has("address") && json.has("okved") && json.has("name")) {
+                    // Проверка имени компании
+                    String companyName = json.getString("name");
+                    if (name == null || !name.trim().equalsIgnoreCase(companyName.trim())) {
+                        return CheckStatus.INVALID_COMPANY_NAME;
+                    }
+
                     JSONObject address = json.getJSONObject("address");
                     JSONArray okvedArray = json.getJSONArray("okved");
 
@@ -72,23 +83,57 @@ public class CompanyChecker {
                         }
                     }
                     if (!hasSoftwareDevelopment) {
-                        return CheckResult.ACTIVITY_NOT_SUITABLE;
+                        return CheckStatus.ACTIVITY_NOT_SUITABLE;
                     }
 
                     if (practiceType == PracticeType.OFFLINE &&
                             (!address.has("regionCode") || !"78".equals(address.getString("regionCode")))) {
-                        return CheckResult.LOCATION_NOT_SUITABLE;
+                        return CheckStatus.LOCATION_NOT_SUITABLE;
                     }
 
-                    return CheckResult.OK;
+                    return CheckStatus.OK;
                 }
                 else {
-                    return CheckResult.COMPANY_NOT_FOUND;
+                    return CheckStatus.COMPANY_NOT_FOUND;
                 }
             }
         } catch (Exception e) {
-            return CheckResult.API_ERROR;
+            return CheckStatus.API_ERROR;
         }
+    }
+
+    private boolean hasValidName(JSONObject svYul, String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return false;
+        }
+        // Проверка ЕГРЮЛ-формата
+        if (svYul.has("СвНаимЮЛ") && !svYul.isNull("СвНаимЮЛ")) {
+            JSONObject svNaimYul = svYul.getJSONObject("СвНаимЮЛ");
+            // Проверка полного названия
+            if (svNaimYul.has("@attributes") && !svNaimYul.isNull("@attributes")) {
+                JSONObject attrs = svNaimYul.getJSONObject("@attributes");
+                if (attrs.has("НаимЮЛПолн") && !attrs.isNull("НаимЮЛПолн")) {
+                    String fullName = attrs.getString("НаимЮЛПолн");
+                    if (name.trim().equals(fullName.replaceAll("[\\s]{2,}", " ").trim())) {
+                        return true;
+                    }
+                }
+            }
+            // Проверка сокращённого названия
+            if (svNaimYul.has("СвНаимЮЛСокр") && !svNaimYul.isNull("СвНаимЮЛСокр")) {
+                JSONObject svNaimYulSokr = svNaimYul.getJSONObject("СвНаимЮЛСокр");
+                if (svNaimYulSokr.has("@attributes") && !svNaimYulSokr.isNull("@attributes")) {
+                    JSONObject attrs = svNaimYulSokr.getJSONObject("@attributes");
+                    if (attrs.has("НаимСокр") && !attrs.isNull("НаимСокр")) {
+                        String shortName = attrs.getString("НаимСокр");
+                        if (name.trim().equals(shortName.replaceAll("[\\s]{2,}", " ").trim())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private boolean hasActivity(JSONObject svYul, String code) {

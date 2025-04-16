@@ -18,6 +18,9 @@ public class Apply {
     @Enumerated(EnumType.STRING)
     private ApplyStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private CheckStatus checkStatus;
+
     @ManyToOne
     @JoinColumn(name = "supervisor_id")
     private Supervisor supervisor;

@@ -12,7 +12,7 @@ import ru.itmo.practicemanager.repository.ApplyRepository;
 import ru.itmo.practicemanager.repository.OrganizationRepository;
 import ru.itmo.practicemanager.repository.StudentRepository;
 import ru.itmo.practicemanager.repository.SupervisorRepository;
-import ru.itmo.practicemanager.entity.CheckResult;
+import ru.itmo.practicemanager.entity.CheckStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,8 +31,10 @@ public class ApplyService {
 
     private final CompanyChecker companyChecker;
 
+    private final ContactValidator contactValidator;
+
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public CheckResult createOrUpdateApplication(PracticeApplicationRequest request) {
+    public CheckStatus createOrUpdateApplication(PracticeApplicationRequest request) {
         // Находим студента по telegram username
         Student student = studentRepository.findByUserTelegramId(request.getTelegramId())
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с таким телеграм именем"));
@@ -99,11 +101,21 @@ public class ApplyService {
                             .build()));
         }
 
-        // Проверяем компанию
-        CheckResult checkResult = companyChecker.checkCompany(organization.getInn().toString(), request.getPracticeType());
+        CheckStatus checkStatus;
+
+        if (!contactValidator.isValidEmail(request.getMail())) {
+            checkStatus = CheckStatus.INVALID_EMAIL;
+        }
+        else if (!contactValidator.isValidPhoneNumber(request.getPhone())) {
+            checkStatus = CheckStatus.INVALID_PHONE;
+        }
+        else {
+            checkStatus = companyChecker.checkCompany(
+                    organization.getInn().toString(), request.getPracticeType(), request.getOrganisationName());
+        }
 
         ApplyStatus status = REJECTED;
-        if (checkResult.equals(CheckResult.OK)) {
+        if (checkStatus.equals(CheckStatus.OK)) {
             status = APPROVED;
         }
 
@@ -113,13 +125,14 @@ public class ApplyService {
                 .organization(organization)
                 .supervisor(supervisor)
                 .status(status)
+                .checkStatus(checkStatus)
                 .practiceType(request.getPracticeType())
                 .build();
         student.setApply(application);
         studentRepository.save(student);
         Apply saved = applicationRepository.save(application);
 
-        return checkResult;
+        return checkStatus;
     }
 
     @Transactional(readOnly = true)
@@ -143,7 +156,7 @@ public class ApplyService {
     @Transactional
     public void updateApplicationStatus(String isuNumber, ApplyStatus status) {
         Apply application = applicationRepository.findByStudentIsuNumber(isuNumber)
-                .orElseThrow(() -> new EntityNotFoundException("Заявка у данного студента не существуее"));
+                .orElseThrow(() -> new EntityNotFoundException("Заявка у данного студента не существует"));
 
         application.setStatus(status);
         applicationRepository.save(application);
@@ -153,6 +166,7 @@ public class ApplyService {
         return PracticeApplicationDto.builder()
                 .id(application.getId())
                 .status(application.getStatus().name())
+                .status(application.getCheckStatus().name())
                 .isuNumber(application.getStudent().getIsuNumber())
                 .studentName(application.getStudent().getFullName())
                 .groupNumber(application.getStudent().getStudyGroup().getNumber())
