@@ -5,7 +5,6 @@ import lombok.Getter;
 @Getter
 public enum Command {
     GET_APPROVALS("get_approvals", true, "Получить студентов по статусу регистрации"),
-    GET_APPROVALS_STATUS("get_approvals_status", true, "Возвращает список доступных статусов регистрации"),
     GET_APPROVALS_EXCEL("get_approvals_excel", true, "Скачать шаблон для подтверждения"),
     POST_APPROVALS_EXCEL("post_approvals_excel", true, "Загрузить подтверждения"),
     PUT_APPROVALS("put_approvals", true, "Изменить статус регистрации по ISU номеру"),
