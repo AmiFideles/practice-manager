@@ -42,6 +42,7 @@ public class StudentController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Получить файл со студентами")
     @GetMapping("/report")
     public ResponseEntity<byte[]> generateStudentReport() throws IOException {
         byte[] report = reportGenerator.generateReport();
@@ -52,12 +53,14 @@ public class StudentController {
                 .body(report);
     }
 
+    @Operation(summary = "Получить студента по его ISU номеру")
     @GetMapping("/{isuNumber}")
     public ResponseEntity<Student> getStudentByIsuNumber(@PathVariable String isuNumber) {
         Student student = studentService.getByIsuNumber(isuNumber);
         return ResponseEntity.ok(student);
     }
 
+    @Operation(summary = "Получить выборку студентов по заданным фильтрам. Фильтры могут комбинироваться.")
     @GetMapping("")
     public ResponseEntity<List<Student>> getStudentsByFilters(
             @RequestParam(required = false) String groupNumber,
@@ -77,6 +80,17 @@ public class StudentController {
         return ResponseEntity.ok(students);
     }
 
+    @Operation(
+            summary = "Устанавливаем студенту статусы по его ISU номеру.",
+            description = "Все параметры необязательные. Предполагается наличие отдельной команды в боте для каждого параметра.\n\n"
+                    + "Обозначения параметров:\n\n"
+                    + "• isStatementDelivered - Студент принёс заявку\n\n"
+                    + "• isStatementSigned - Студент подписал заявку\n\n"
+                    + "• isStatementScanned - Студент принёс скан заявки\n\n"
+                    + "• isNotificationSent - У студента есть уведомление\n\n"
+                    + "• comment - Поле для комментария\n\n"
+                    + "• individualAssignmentStatus - Статус итогового задания"
+    )
     @PutMapping("/{isuNumber}/status")
     public ResponseEntity<?> updateStudentStatuses(
             @PathVariable String isuNumber,

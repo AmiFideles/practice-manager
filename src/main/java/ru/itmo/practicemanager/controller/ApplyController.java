@@ -1,5 +1,6 @@
 package ru.itmo.practicemanager.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class ApplyController {
     private final ApplyService applyService;
     private final PDFApplyService pdfApplyService;
 
+    @Operation(summary = "Создать заявку")
     @PostMapping
     public ResponseEntity<?> createApplication(
             @RequestBody PracticeApplicationRequest request) {
@@ -49,6 +51,7 @@ public class ApplyController {
         };
     }
 
+    @Operation(summary = "Получить выборку студентов по заданным фильтрам. Фильтры могут комбинироваться.")
     @GetMapping
     public ResponseEntity<List<PracticeApplicationDto>> getApplications(
             @RequestParam(required = false) ApplyStatus status,
@@ -62,6 +65,7 @@ public class ApplyController {
         }
     }
 
+    @Operation(summary = "Устанавливаем студенту статусы его заявки по его ISU номеру.")
     @PutMapping("/{isuNumber}")
     public ResponseEntity<?> updateApplicationStatus(
             @PathVariable String isuNumber,
