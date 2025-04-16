@@ -34,7 +34,7 @@ public class PostApprovalsExcelClient {
                 }
             };
             var statusCode = webClient.post()
-                    .uri("/api/aprovals")
+                    .uri("/api/approvals")
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(BodyInserters.fromMultipartData("file", resource))
                     .exchangeToMono(response -> Mono.just(response.statusCode()))

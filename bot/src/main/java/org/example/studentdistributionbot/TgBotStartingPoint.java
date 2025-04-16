@@ -92,6 +92,7 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                     var response = clientFacade.registerUser(userContextStorage.getData(userMetadata.chatId));
                     if (response != null) {
                         userContextStorage.clear(userMetadata.chatId);
+                        sendMessage(userMetadata.chatId, response);
                     } else {
                         sendMessage(userMetadata.chatId, "Произошла ошибка при регистрации");
                     }
