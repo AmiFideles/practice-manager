@@ -107,7 +107,7 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                         commandHandler.postApply(practiceApplicationRequest, telegramClient, userMetadata.chatId);
                     } catch (Exception e) {
                         log.error(e.getMessage());
-                        sendMessage(userMetadata.chatId, "Ошибка при заполнение заявки, неправильный формат");
+                        sendMessage(userMetadata.chatId, e.getMessage());
                     }
                 }
                 case WAITING_FOR_FULL_NAME -> {

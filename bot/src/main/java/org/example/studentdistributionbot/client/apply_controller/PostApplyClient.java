@@ -26,7 +26,7 @@ public class PostApplyClient {
                     .bodyToMono(String.class)
                     .block();
         } catch (Exception e) {
-            log.error("Ошибка при заполнение заявки, неправильный формат", e.getMessage());
+            log.error("Ошибка при заполнение заявки, неправильный формат. {}", e.getMessage());
             return e.getMessage();
         }
     }
