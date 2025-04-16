@@ -17,6 +17,5 @@ public class Organization {
     Long id;
     Long inn;
     String name;
-    String direction;
     String location;
 }

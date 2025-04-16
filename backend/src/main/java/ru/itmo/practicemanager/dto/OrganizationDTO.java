@@ -6,6 +6,5 @@ import lombok.Data;
 public class OrganizationDTO {
     Long inn;
     String name;
-    String direction;
     String location;
 }

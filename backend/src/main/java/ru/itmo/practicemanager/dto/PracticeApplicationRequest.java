@@ -14,7 +14,6 @@ public class PracticeApplicationRequest {
     private Long telegramId;
     private Long inn;
     private String organisationName;
-    private String direction;
     private String location;
     private String supervisorName;
     private String mail;
