@@ -127,6 +127,6 @@ public class ApprovalStatusController {
             @PathVariable String isuNumber,
             @RequestBody ApprovalStatusDTO approvalStatusDTO) {
         studentService.approveByIsuNumber(isuNumber, approvalStatusDTO);
-        return ResponseEntity.ok("Регистрация студента с ISU " + isuNumber + " подтверждена");
+        return ResponseEntity.ok("Cтатус студента с ISU " + isuNumber + " изменен");
     }
 }

@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 import static ru.itmo.practicemanager.entity.ApplyStatus.APPROVED;
 import static ru.itmo.practicemanager.entity.ApplyStatus.REJECTED;
+import static ru.itmo.practicemanager.entity.ApplyStatus.PENDING;
+import static ru.itmo.practicemanager.entity.CheckStatus.OK;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +58,9 @@ public class ApplyService {
         Supervisor supervisor = null;
         Organization organization;
 
+        ApplyStatus status;
+        CheckStatus checkStatus;
+
         if ("ИТМО".equalsIgnoreCase(request.getOrganisationName())) {
             organization = organizationRepository.findByName("ИТМО")
                     .orElseThrow(() -> new EntityNotFoundException("Организация ИТМО не найдена"));
@@ -70,6 +75,10 @@ public class ApplyService {
                                 .organization(organization)
                                 .build()));
             }
+
+            checkStatus = OK;
+            status = APPROVED;
+
         } else {
             // Для внешних организаций
             if (request.getInn() == null) {
@@ -97,24 +106,25 @@ public class ApplyService {
                             .phone(request.getPhone())
                             .organization(organization)
                             .build()));
-        }
 
-        CheckStatus checkStatus;
+            if (!contactValidator.isValidEmail(request.getMail())) {
+                checkStatus = CheckStatus.INVALID_EMAIL;
+            }
+            else if (!contactValidator.isValidPhoneNumber(request.getPhone())) {
+                checkStatus = CheckStatus.INVALID_PHONE;
+            }
+            else {
+                checkStatus = companyChecker.checkCompany(
+                        organization.getInn().toString(), request.getPracticeType(), request.getOrganisationName());
+            }
 
-        if (!contactValidator.isValidEmail(request.getMail())) {
-            checkStatus = CheckStatus.INVALID_EMAIL;
-        }
-        else if (!contactValidator.isValidPhoneNumber(request.getPhone())) {
-            checkStatus = CheckStatus.INVALID_PHONE;
-        }
-        else {
-            checkStatus = companyChecker.checkCompany(
-                    organization.getInn().toString(), request.getPracticeType(), request.getOrganisationName());
-        }
-
-        ApplyStatus status = REJECTED;
-        if (checkStatus.equals(CheckStatus.OK)) {
-            status = APPROVED;
+            status = REJECTED;
+            if (checkStatus.equals(CheckStatus.API_ERROR) || checkStatus.equals(CheckStatus.JSON_PARSING_ERROR) ) {
+                status = PENDING;
+            }
+            else if (checkStatus.equals(OK)) {
+                status = APPROVED;
+            }
         }
 
         // Создаем новую заявку
