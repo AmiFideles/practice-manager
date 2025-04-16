@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.itmo.practicemanager.dto.RoleDto;
 import ru.itmo.practicemanager.dto.UserDto;
+import ru.itmo.practicemanager.entity.Role;
 import ru.itmo.practicemanager.entity.User;
 import ru.itmo.practicemanager.repository.UserRepository;
 import ru.itmo.practicemanager.service.StudentService;
@@ -23,7 +24,9 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> registerStudent(
             @RequestBody UserDto request) {
-        studentService.register(request);
+        if (userRepository.findByTelegramIdAndRole(request.getTelegramId(), Role.ADMIN).isPresent()){
+            return ResponseEntity.ok("Вам доступны команды администратора");
+        }
         return ResponseEntity.ok("Запрос на регистрацию отправлен. Вы можете проверить статус с помощью ...");
     }
 
