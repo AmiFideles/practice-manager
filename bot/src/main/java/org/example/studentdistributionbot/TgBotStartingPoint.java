@@ -4,7 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.studentdistributionbot.client.ClientFacade;
 import org.example.studentdistributionbot.commands.BotCommandHandler;
 import org.example.studentdistributionbot.commands.LoadApproveFileHandler;
-import org.example.studentdistributionbot.commands.aply_controller.PostApplyCommandHandler;
+import org.example.studentdistributionbot.commands.apply_controller.GetApplyCommandHandler;
+import org.example.studentdistributionbot.commands.apply_controller.PostApplyCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.GetApprovalsCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.GetApprovalsStudentStatusCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.PostApprovalsExcelCommandHandler;
@@ -195,6 +196,20 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                         commandHandler.getStudentIsuNumber(isuNumber, telegramClient, userMetadata.chatId);
                     } catch (Exception e) {
                         log.error(e.getMessage());
+                    }
+                    userContextStorage.clear(userMetadata.chatId);
+                }
+                case WAITING_APPLY_FILTERS -> {
+                    String[] filters = update.getMessage().getText().split(" ");
+                    if (filters[0].equals("-")) {
+                        filters = new String[]{};
+                    }
+                    GetApplyCommandHandler commandHandler = (GetApplyCommandHandler) commandHandlers.get(Command.GET_APPLY);
+                    try {
+                        commandHandler.doRequest(update, telegramClient, filters);
+                    } catch (TelegramApiException e) {
+                        log.error(e.getMessage());
+                        sendMessage(userMetadata.chatId, "При заполнении фильтров что-то пошло не так");
                     }
                     userContextStorage.clear(userMetadata.chatId);
                 }
