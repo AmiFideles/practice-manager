@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 import static ru.itmo.practicemanager.entity.ApplyStatus.APPROVED;
 import static ru.itmo.practicemanager.entity.ApplyStatus.REJECTED;
+import static ru.itmo.practicemanager.entity.ApplyStatus.PENDING;
+import static ru.itmo.practicemanager.entity.CheckStatus.OK;
 
 @Service
 @RequiredArgsConstructor
@@ -118,9 +120,9 @@ public class ApplyService {
 
             status = REJECTED;
             if (checkStatus.equals(CheckStatus.API_ERROR) || checkStatus.equals(CheckStatus.JSON_PARSING_ERROR) ) {
-                status = ApplyStatus.PENDING;
+                status = PENDING;
             }
-            else if (checkStatus.equals(CheckStatus.OK)) {
+            else if (checkStatus.equals(OK)) {
                 status = APPROVED;
             }
         }
