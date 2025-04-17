@@ -14,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -58,18 +57,8 @@ public class PDFApplyService {
         ApplicationPdfData data = buildApplicationPdfData(telegramId);
 
         byte[] filledDoc = fillDocxTemplate(data);
-        byte[] pdf = convertFromDocxToPdf(filledDoc);
+        return convertFromDocxToPdf(filledDoc);
 
-        String safeName = data.getFullName().replaceAll("[^\\p{L}\\d]", "_");
-        Path targetPath = Paths.get("src/main/resources", safeName + "_template.pdf");
-        try {
-            Files.write(targetPath, pdf);
-            log.info("Файл заявки сохранён в {}", targetPath);
-        } catch (IOException e) {
-            throw new IllegalStateException("Не удалось записать файл", e);
-        }
-
-        return pdf;
     }
 
     /* ======================= CORE =========================================== */
