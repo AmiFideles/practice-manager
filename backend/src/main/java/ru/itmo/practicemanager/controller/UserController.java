@@ -24,10 +24,8 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> registerStudent(
             @RequestBody UserDto request) {
-        if (userRepository.findByTelegramIdAndRole(request.getTelegramId(), Role.ADMIN).isPresent()){
-            return ResponseEntity.ok("Вам доступны команды администратора");
-        }
-        return ResponseEntity.ok("Запрос на регистрацию отправлен. Вы можете проверить статус с помощью ...");
+        studentService.register(request);
+        return ResponseEntity.ok("Запрос на регистрацию отправлен. Вы можете отправить заявку на согласование");
     }
 
     @Operation(summary = "Получить роль юзера по его TG id")
