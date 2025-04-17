@@ -6,8 +6,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
-import ru.itmo.practicemanager.entity.Student;
-import ru.itmo.practicemanager.entity.StudyGroup;
+import ru.itmo.practicemanager.entity.*;
 import ru.itmo.practicemanager.repository.StudentRepository;
 import ru.itmo.practicemanager.service.excel.ExcelStyleHelper;
 
@@ -137,8 +136,23 @@ public class StudentReportGenerator {
 
     private void fillPracticePlaceCell(Cell cell, Student student, ExcelStyleHelper styleHelper) {
         String orgName = "ИТМО";
-        if (student.getApply() != null && student.getApply().getOrganization() != null) {
-            orgName = student.getApply().getOrganization().getName() + ", " + student.getApply().getSupervisor().getName();
+
+        Apply apply = student.getApply();
+        if (apply != null) {
+            Organization organization = apply.getOrganization();
+            Supervisor supervisor = apply.getSupervisor();
+
+            if (organization != null) {
+                String organizationName = organization.getName();
+
+                if ("ИТМО".equals(organizationName)) {
+                    if (supervisor != null && supervisor.getName() != null) {
+                        orgName = "ИТМО, " + supervisor.getName();
+                    }
+                } else {
+                    orgName = organizationName;
+                }
+            }
         }
 
         cell.setCellValue(orgName);
