@@ -10,8 +10,8 @@ import org.example.studentdistributionbot.commands.approvalStatusController.GetA
 import org.example.studentdistributionbot.commands.approvalStatusController.GetApprovalsStudentStatusCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.PostApprovalsExcelCommandHandler;
 import org.example.studentdistributionbot.commands.approvalStatusController.PutApprovalsIsuNumberHandler;
-import org.example.studentdistributionbot.commands.student_controller.GetStudentsIsuNumberHandler;
 import org.example.studentdistributionbot.commands.student_controller.GetStudentsCommandHandler;
+import org.example.studentdistributionbot.commands.student_controller.GetStudentsIsuNumberHandler;
 import org.example.studentdistributionbot.dto.*;
 import org.example.studentdistributionbot.file.BotFileHandler;
 import org.springframework.beans.factory.annotation.Value;
@@ -109,6 +109,7 @@ public class TgBotStartingPoint implements SpringLongPollingBot, LongPollingSing
                         log.error(e.getMessage());
                         sendMessage(userMetadata.chatId, e.getMessage());
                     }
+                    userContextStorage.clear(userMetadata.chatId);
                 }
                 case WAITING_FOR_FULL_NAME -> {
                     userContextStorage.getData(userMetadata.chatId).setFullName(userMetadata.messageText);
