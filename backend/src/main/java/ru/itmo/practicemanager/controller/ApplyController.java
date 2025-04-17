@@ -14,6 +14,7 @@ import ru.itmo.practicemanager.entity.ApplyStatus;
 import ru.itmo.practicemanager.entity.CheckStatus;
 import ru.itmo.practicemanager.service.ApplyService;
 import ru.itmo.practicemanager.service.pdf.PDFApplyService;
+import ru.itmo.practicemanager.service.pdf.TemplateOptionService;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ import java.util.List;
 public class ApplyController {
     private final ApplyService applyService;
     private final PDFApplyService pdfApplyService;
+    private final TemplateOptionService templateOptionService;
 
     @Operation(summary = "Создать заявку на согласование компании.")
     @PostMapping
@@ -85,4 +87,19 @@ public class ApplyController {
                         "attachment; filename=\"apply.pdf\"")
                 .body(pdfContent);
     }
+
+    @Operation(summary = "Установить даты практики")
+    @PutMapping("/practice-date")
+    public ResponseEntity<?> setPracticeDate(@RequestBody String date) {
+        templateOptionService.setPracticeDate(date);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Получить даты практики")
+    @GetMapping("/practice-date")
+    public ResponseEntity<String> getPracticeDate() {
+        String date = templateOptionService.getPracticeDate();
+        return ResponseEntity.ok(date);
+    }
+
 }

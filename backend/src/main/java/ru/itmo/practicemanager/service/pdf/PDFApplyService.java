@@ -25,16 +25,17 @@ import java.util.Map;
 public class PDFApplyService {
 
     private static final String TEMPLATE_PATH = "src/main/resources/template.docx";
-    private static final String PRACTICE_DATES = "с 10.03.2025 по 30.04.2025";
+
 
     private final UserRepository userRepository;
+    private final TemplateOptionService templateOptionService;
 
     private ApplicationPdfData buildApplicationPdfData(Long telegramId) {
         var builder = ApplicationPdfData.builder();
         Student student = userRepository.findById(telegramId).orElseThrow(() -> new IllegalArgumentException("Студент с telegramId " + telegramId + " не найден")).getStudent();
         builder.fullName(student.getFullName());
         builder.group(student.getStudyGroup().getNumber());
-        builder.practiceDates(PRACTICE_DATES);
+        builder.practiceDates(templateOptionService.getPracticeDate());
         builder.faculty(student.getStudyGroup().getDirection().getFacultyName());
         builder.programCode(student.getStudyGroup().getDirection().getNumber());
         builder.programName(student.getStudyGroup().getDirection().getTranscript());
