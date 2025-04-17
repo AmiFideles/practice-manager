@@ -8,6 +8,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +33,7 @@ public class GetStudentsClient {
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<StudentsResponseDto>>() {
                 })
+                .timeout(Duration.ofSeconds(30))
                 .block();
     }
 }
