@@ -3,13 +3,10 @@ package ru.itmo.practicemanager.service.pdf;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xwpf.usermodel.*;
-import org.docx4j.Docx4J;
-import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.springframework.stereotype.Service;
 import ru.itmo.practicemanager.entity.Student;
 import ru.itmo.practicemanager.repository.UserRepository;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +19,7 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PDFApplyService {
+public class DocxApplyService {
 
     private static final String TEMPLATE_PATH = "src/main/resources/template.docx";
 
@@ -30,8 +27,9 @@ public class PDFApplyService {
     private final UserRepository userRepository;
     private final TemplateOptionService templateOptionService;
 
-    private ApplicationPdfData buildApplicationPdfData(Long telegramId) {
-        var builder = ApplicationPdfData.builder();
+
+    private ApplicationDocxData buildApplicationDocxData(Long telegramId) {
+        var builder = ApplicationDocxData.builder();
         Student student = userRepository.findById(telegramId).orElseThrow(() -> new IllegalArgumentException("Студент с telegramId " + telegramId + " не найден")).getStudent();
         builder.fullName(student.getFullName());
         builder.group(student.getStudyGroup().getNumber());
@@ -39,12 +37,14 @@ public class PDFApplyService {
         builder.faculty(student.getStudyGroup().getDirection().getFacultyName());
         builder.programCode(student.getStudyGroup().getDirection().getNumber());
         builder.programName(student.getStudyGroup().getDirection().getTranscript());
+
         builder.format(
           switch (student.getApply().getPracticeType()) {
               case ONLINE -> "с применением дистанционных технологий";
               case OFFLINE -> "очно";
           }
         );
+
         builder.organization(student.getApply().getOrganization().getName());
         builder.organizationAddress(student.getApply().getOrganization().getLocation());
         builder.representativeFullName(student.getApply().getSupervisor().getName());
@@ -54,17 +54,16 @@ public class PDFApplyService {
 
 
 
-    public byte[] generatePracticeApplicationPdf(Long telegramId) {
-        ApplicationPdfData data = buildApplicationPdfData(telegramId);
+    public byte[] generatePracticeApplicationDocx(Long telegramId) {
+        ApplicationDocxData data = buildApplicationDocxData(telegramId);
 
-        byte[] filledDoc = fillDocxTemplate(data);
-        return convertFromDocxToPdf(filledDoc);
+        return fillDocxTemplate(data);
 
     }
 
     /* ======================= CORE =========================================== */
 
-    private byte[] fillDocxTemplate(ApplicationPdfData data) {
+    private byte[] fillDocxTemplate(ApplicationDocxData data) {
         Map<String, String> vars = buildVarsMap(data);
 
         try (InputStream templateIn = Files.newInputStream(Paths.get(TEMPLATE_PATH));
@@ -88,27 +87,12 @@ public class PDFApplyService {
         }
     }
 
-    private byte[] convertFromDocxToPdf(byte[] docxFile) {
-        try (InputStream in  = new ByteArrayInputStream(docxFile);
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-
-            // Загружаем DOCX из входного потока
-            WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(in);
-            Docx4J.toPDF(wordMLPackage, out);
-
-            return out.toByteArray();
-        } catch (Exception e) {
-            throw new IllegalStateException("Ошибка конвертации DOCX → PDF", e);
-        }
-    }
-
-
     /* ======================= HELPERS ======================================== */
 
     /**
      * Таблица замен: key -> value
      */
-    private Map<String, String> buildVarsMap(ApplicationPdfData d) {
+    private Map<String, String> buildVarsMap(ApplicationDocxData d) {
         Map<String, String> m = new HashMap<>();
         m.put("fullName", d.getFullName());
         m.put("faculty", d.getFaculty());

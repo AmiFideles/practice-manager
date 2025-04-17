@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ApplicationPdfData {
+public class ApplicationDocxData {
 
     private String fullName;
     private String faculty;

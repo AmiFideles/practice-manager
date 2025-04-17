@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.itmo.practicemanager.dto.ErrorResponse;
@@ -13,7 +12,7 @@ import ru.itmo.practicemanager.dto.PracticeApplicationRequest;
 import ru.itmo.practicemanager.entity.ApplyStatus;
 import ru.itmo.practicemanager.entity.CheckStatus;
 import ru.itmo.practicemanager.service.ApplyService;
-import ru.itmo.practicemanager.service.pdf.PDFApplyService;
+import ru.itmo.practicemanager.service.pdf.DocxApplyService;
 import ru.itmo.practicemanager.service.pdf.TemplateOptionService;
 
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ApplyController {
     private final ApplyService applyService;
-    private final PDFApplyService pdfApplyService;
+    private final DocxApplyService docxApplyService;
     private final TemplateOptionService templateOptionService;
 
     @Operation(summary = "Создать заявку на согласование компании.")
@@ -76,16 +75,19 @@ public class ApplyController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<byte[]> generatePracticeApplicationPdf(
+    @GetMapping(
+            value = "/docx",
+            produces = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+    public ResponseEntity<byte[]> generatePracticeApplicationDocx(
             @RequestParam Long telegramId) {
 
-        byte[] pdfContent = pdfApplyService.generatePracticeApplicationPdf(telegramId);
+        byte[] docxContent = docxApplyService.generatePracticeApplicationDocx(telegramId);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"apply.pdf\"")
-                .body(pdfContent);
+                        "attachment; filename=\"apply.docx\"")
+                .body(docxContent);
     }
 
     @Operation(summary = "Установить даты практики")
