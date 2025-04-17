@@ -19,7 +19,7 @@ public class WebClientConfiguration {
                 .responseTimeout(Duration.ofSeconds(30));
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(client))
-                .baseUrl("http://localhost:8082")
+                .baseUrl("http://backend:8080")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
