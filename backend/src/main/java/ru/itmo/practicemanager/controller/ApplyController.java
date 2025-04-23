@@ -12,8 +12,8 @@ import ru.itmo.practicemanager.dto.PracticeApplicationRequest;
 import ru.itmo.practicemanager.entity.ApplyStatus;
 import ru.itmo.practicemanager.entity.CheckStatus;
 import ru.itmo.practicemanager.service.ApplyService;
-import ru.itmo.practicemanager.service.pdf.DocxApplyService;
-import ru.itmo.practicemanager.service.pdf.TemplateOptionService;
+import ru.itmo.practicemanager.service.docx.DocxApplyService;
+import ru.itmo.practicemanager.service.docx.TemplateOptionConfig;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ import java.util.List;
 public class ApplyController {
     private final ApplyService applyService;
     private final DocxApplyService docxApplyService;
-    private final TemplateOptionService templateOptionService;
+    private final TemplateOptionConfig templateOptionConfig;
 
     @Operation(summary = "Создать заявку на согласование компании.")
     @PostMapping
@@ -93,14 +93,14 @@ public class ApplyController {
     @Operation(summary = "Установить даты практики")
     @PutMapping("/practice-date")
     public ResponseEntity<?> setPracticeDate(@RequestBody String date) {
-        templateOptionService.setPracticeDate(date);
+        templateOptionConfig.setPracticeDateRange(date);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Получить даты практики")
     @GetMapping("/practice-date")
     public ResponseEntity<String> getPracticeDate() {
-        String date = templateOptionService.getPracticeDate();
+        String date = templateOptionConfig.getPracticeDateRange();
         return ResponseEntity.ok(date);
     }
 

@@ -1,4 +1,17 @@
 services:
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      DATASOURCE_USERNAME: postgres
+      DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - template-config:/app/config
   db:
     image: postgres:latest
     environment:
@@ -18,3 +31,8 @@ services:
 
 volumes:
   pgdata:
+  template-config:
+    external: true
+
+
+

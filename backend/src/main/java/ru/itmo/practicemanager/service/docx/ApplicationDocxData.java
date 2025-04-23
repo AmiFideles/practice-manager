@@ -1,4 +1,4 @@
-package ru.itmo.practicemanager.service.pdf;
+package ru.itmo.practicemanager.service.docx;
 
 import lombok.Builder;
 import lombok.Data;
@@ -15,8 +15,6 @@ public class ApplicationDocxData {
     private String practiceDates;
     private String format;
     private String organization;
-    private String organizationAddress;
-    private String representativePosition;
     private String representativeFullName;
 
 }
