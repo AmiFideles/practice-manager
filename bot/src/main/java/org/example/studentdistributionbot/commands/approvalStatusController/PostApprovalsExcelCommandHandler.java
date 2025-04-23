@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.studentdistributionbot.BotState;
 import org.example.studentdistributionbot.Command;
 import org.example.studentdistributionbot.UserContextStorage;
-import org.example.studentdistributionbot.client.approvalStatusController.PostApprovalsExcelClient;
 import org.example.studentdistributionbot.client.UserRoleResolverClient;
+import org.example.studentdistributionbot.client.approvalStatusController.PostApprovalsExcelClient;
 import org.example.studentdistributionbot.commands.BotCommandHandler;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -39,11 +39,16 @@ public class PostApprovalsExcelCommandHandler implements BotCommandHandler {
     }
 
     public void loadFile(String fileName, InputStream stream, TelegramClient client, Long chatId) throws TelegramApiException {
-        HttpStatusCode statusCode = postApprovalsExcelClient.postApprovalsExcel(fileName, stream);
-        if (statusCode.is2xxSuccessful()) {
-            sendMessage(chatId, client, "Файл успешно загружен");
-        } else {
-            sendMessage(chatId, client, "Что-то пошло не так");
+        try {
+            HttpStatusCode statusCode = postApprovalsExcelClient.postApprovalsExcel(fileName, stream);
+            if (statusCode != null && statusCode.is2xxSuccessful()) {
+                sendMessage(chatId, client, "Файл успешно загружен");
+            } else {
+                sendMessage(chatId, client, "Ошибка при загрузке файла: некорректный ответ от сервера");
+            }
+        } catch (Exception e) {
+            sendMessage(chatId, client, "Произошла ошибка при загрузке файла: " + e.getMessage());
         }
     }
+
 }
