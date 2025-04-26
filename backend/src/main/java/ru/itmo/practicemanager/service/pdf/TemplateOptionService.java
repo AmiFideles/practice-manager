@@ -11,12 +11,12 @@ import java.io.IOException;
 @Service
 public class TemplateOptionService {
     private final ObjectMapper objectMapper;
-    private final File templateFile;
+    private File templateFile;
 
     public TemplateOptionService(ObjectMapper objectMapper) throws IOException {
         this.objectMapper = objectMapper;
-        ClassPathResource resource = new ClassPathResource("template_option.json");
-        this.templateFile = resource.getFile();
+//        ClassPathResource resource = new ClassPathResource("template_option.json");
+//        this.templateFile = resource.getFile();
     }
 
     /**

@@ -12,7 +12,15 @@ import lombok.*;
 @AllArgsConstructor
 public class Apply {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "apply_seq_gen",
+            sequenceName = "apply_seq",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "apply_seq_gen"
+    )
     private Long id;
 
     @Enumerated(EnumType.STRING)

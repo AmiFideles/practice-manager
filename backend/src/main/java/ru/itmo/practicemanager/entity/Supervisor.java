@@ -13,7 +13,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Supervisor {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "supervisor_seq_gen",
+            sequenceName = "supervisor_seq",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "supervisor_seq_gen"
+    )
     Long id;
     String name;
     String mail;

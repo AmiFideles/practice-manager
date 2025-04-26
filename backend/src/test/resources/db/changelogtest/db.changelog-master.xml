@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1.1" author="Shakhzodbek">
+        <comment>Create users table</comment>
+        <sqlFile path="init/V1.1__create_user.sql"
+                 relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="rollback/V1.1__rollback_user.sql"
+                     relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="1.2" author="Shakhzodbek">
+        <comment>Create direction table</comment>
+        <sqlFile path="init/V1.2__create_direction.sql"
+                 relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="rollback/V1.2__rollback_direction.sql"
+                     relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="1.3" author="Shakhzodbek">
+        <comment>Create organization table</comment>
+        <sqlFile path="init/V1.3__create_organization.sql"
+                 relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="rollback/V1.3__rollback_organization.sql"
+                     relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="1.4" author="Shakhzodbek">
+        <comment>Create study_group table</comment>
+        <sqlFile path="init/V1.4__create_study_group.sql"
+                 relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="rollback/V1.4__rollback_study_group.sql"
+                     relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="1.5" author="Shakhzodbek">
+        <comment>Create supervisor table</comment>
+        <sqlFile path="init/V1.5__create_supervisor.sql"
+                 relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="rollback/V1.5__rollback_supervisor.sql"
+                     relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="1.6" author="Shakhzodbek">
+        <comment>Create student table</comment>
+        <sqlFile path="init/V1.6__create_student.sql"
+                 relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="rollback/V1.6__rollback_student.sql"
+                     relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="1.7" author="Shakhzodbek">
+        <comment>Create activity_code table</comment>
+        <sqlFile path="init/V1.7__create_activity_code.sql"
+                 relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="rollback/V1.7__rollback_activity_code.sql"
+                     relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="1.8" author="Shakhzodbek">
+        <comment>Create apply table</comment>
+        <sqlFile path="init/V1.8__create_apply.sql"
+                 relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="rollback/V1.8__rollback_apply.sql"
+                     relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="1.9" author="Shakhzodbek">
+        <comment>Create apply table</comment>
+        <sqlFile path="init/V1.9__init_start_data.sql"
+                 relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="rollback/V1.9__init_rollback_data.sql"
+                     relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

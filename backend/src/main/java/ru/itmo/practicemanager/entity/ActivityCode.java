@@ -1,9 +1,6 @@
 package ru.itmo.practicemanager.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -12,9 +9,20 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class ActivityCode {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
-    String code;
+    @SequenceGenerator(
+            name = "activity_code_seq_gen",
+            sequenceName = "activity_code_seq",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "activity_code_seq_gen"
+    )
+    private Long id;
+
+    @Column(nullable = false)
+    private String code;
 }

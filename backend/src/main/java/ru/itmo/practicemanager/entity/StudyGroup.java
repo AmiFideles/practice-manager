@@ -13,7 +13,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StudyGroup implements Comparable<StudyGroup> {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "study_group_seq_gen",
+            sequenceName = "study_group_seq",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "study_group_seq_gen"
+    )
     Long id;
     String number;
     @ManyToOne

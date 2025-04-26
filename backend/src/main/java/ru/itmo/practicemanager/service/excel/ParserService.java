@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
 public class ParserService {
     private final StudyGroupRepository studyGroupRepository;
     private final DirectionRepository directionRepository;
-    private final String SOFTWARE_ENGINEERING = "09.03.04";
-    private final String COMPUTER_ENGINEERING = "09.03.01";
+    private static final String SOFTWARE_ENGINEERING = "09.03.04";
+    private static final String COMPUTER_ENGINEERING = "09.03.01";
 
     public List<Student> parseStudentsFromExcel(MultipartFile file) {
         String html;

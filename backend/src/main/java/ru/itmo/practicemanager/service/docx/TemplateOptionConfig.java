@@ -18,7 +18,7 @@ public class TemplateOptionConfig {
 
     @PostConstruct
     public void init() {
-        load();
+//        load();
     }
 
     public synchronized String getPracticeDateRange() {

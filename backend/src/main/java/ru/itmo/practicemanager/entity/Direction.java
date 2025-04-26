@@ -1,9 +1,6 @@
 package ru.itmo.practicemanager.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +13,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Direction {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "direction_seq_gen",
+            sequenceName = "direction_seq",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "direction_seq_gen"
+    )
     Long id;
     String transcript;
     String number;

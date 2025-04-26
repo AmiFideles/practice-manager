@@ -11,7 +11,15 @@ import lombok.*;
 @AllArgsConstructor
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "student_seq_gen",
+            sequenceName = "student_seq",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "student_seq_gen"
+    )
     private Long id;
 
     private String fullName;

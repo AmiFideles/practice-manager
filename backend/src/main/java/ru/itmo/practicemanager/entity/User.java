@@ -12,9 +12,16 @@ import lombok.*;
 @AllArgsConstructor
 @Table(name = "users")
 public class User {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+            name = "user_seq_gen",
+            sequenceName = "user_seq",
+            allocationSize =    1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_seq_gen"
+    )
     private Long id;
 
     private Long telegramId;

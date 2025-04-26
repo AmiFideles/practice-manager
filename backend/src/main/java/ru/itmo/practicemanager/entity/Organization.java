@@ -13,7 +13,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Organization {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "organization_seq_gen",
+            sequenceName = "organization_seq",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "organization_seq_gen"
+    )
     Long id;
     Long inn;
     String name;

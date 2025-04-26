@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.itmo.practicemanager.dto.RegistrationResponseDto;
 import ru.itmo.practicemanager.dto.RoleDto;
 import ru.itmo.practicemanager.dto.UserDto;
 import ru.itmo.practicemanager.entity.Role;
@@ -24,8 +25,8 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> registerStudent(
             @RequestBody UserDto request) {
-        studentService.register(request);
-        return ResponseEntity.ok("Запрос на регистрацию отправлен. Вы можете отправить заявку на согласование");
+        RegistrationResponseDto register = studentService.register(request);
+        return ResponseEntity.ok(register.getMessage());
     }
 
     @Operation(summary = "Получить роль юзера по его TG id")

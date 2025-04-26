@@ -9,10 +9,7 @@ import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.itmo.practicemanager.dto.ApprovalStatusDTO;
-import ru.itmo.practicemanager.dto.GroupedApprovalsDto;
-import ru.itmo.practicemanager.dto.StudentApprovalDto;
-import ru.itmo.practicemanager.dto.UserDto;
+import ru.itmo.practicemanager.dto.*;
 import ru.itmo.practicemanager.entity.*;
 import ru.itmo.practicemanager.exception.RegistrationException;
 import ru.itmo.practicemanager.repository.StudentRepository;
@@ -129,9 +126,22 @@ public class StudentService {
     }
 
 
-    // TODO обработка ошибок
     @Transactional
-    public void register(UserDto request) {
+    public RegistrationResponseDto register(UserDto request) {
+        Optional<User> existingAdmin = userRepository.findByTelegramIdAndRole(
+                request.getTelegramId(),
+                Role.ADMIN
+        );
+
+        if (existingAdmin.isPresent()) {
+            User admin = existingAdmin.get();
+            admin.setTelegramUsername(request.getTelegramUsername());
+            userRepository.save(admin);
+            return RegistrationResponseDto.builder()
+                    .message("Администратор успешно зарегистрирован")
+                    .build();
+        }
+
         Student student = studentRepository.findByFullNameAndIsuNumber(
                 request.getFullName(),
                 request.getIsuNumber()
@@ -152,6 +162,10 @@ public class StudentService {
         student.setUser(user);
         userRepository.save(user);
         studentRepository.save(student);
+
+        return RegistrationResponseDto.builder()
+                .message("Запрос на регистрацию отправлен и будет рассмотрен преподавателем. Вы можете отправить заявку на согласование")
+                .build();
     }
 
     @Transactional
