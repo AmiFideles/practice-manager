@@ -28,14 +28,14 @@ services:
     networks:
       - practice-net
 
-  # bot:
-  #   build:
-  #     context: ./bot
-  #   container_name: bot
-  #   depends_on:
-  #     - backend
-  #   networks:
-  #     - practice-net
+  bot:
+     build:
+       context: ./bot
+     container_name: bot
+     depends_on:
+       - backend
+     networks:
+       - practice-net
 
 volumes:
   postgres-data:
