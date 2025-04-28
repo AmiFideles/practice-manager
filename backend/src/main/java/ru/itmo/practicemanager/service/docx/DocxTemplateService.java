@@ -16,14 +16,14 @@ public class DocxTemplateService {
 
     private byte[] templateBytes;
 
-//    @PostConstruct
-//    public void init() {
-//        try {
-//            templateBytes = Files.readAllBytes(TEMPLATE_PATH);
-//        } catch (IOException e) {
-//            throw new IllegalStateException("Не удалось загрузить шаблон docx из " + TEMPLATE_PATH, e);
-//        }
-//    }
+    @PostConstruct
+    public void init() {
+        try {
+            templateBytes = Files.readAllBytes(TEMPLATE_PATH);
+        } catch (IOException e) {
+            throw new IllegalStateException("Не удалось загрузить шаблон docx из " + TEMPLATE_PATH, e);
+        }
+    }
 
     /**
      * Возвращает копию байтов шаблона.
