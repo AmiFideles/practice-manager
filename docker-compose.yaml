@@ -28,8 +28,8 @@ services:
     networks:
       - practice-net
     volumes:
-      - ./src/main/resources/template.docx:/app/config/template.docx
-      - ./src/main/resources/template_option:/app/config/template_option
+      - ./backend/src/main/resources/template.docx:/app/config/template.docx
+      - ./backend/src/main/resources/template_option:/app/config/template_option
 
   bot:
      build:
